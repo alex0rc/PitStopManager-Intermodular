@@ -12,10 +12,6 @@ use Illuminate\Support\Facades\Mail;
 
 class RaceReminderService
 {
-    // --- Recordatorios ---
-    /**
-     * @return array{sent: int, skipped: int, races: int}
-     */
     public function sendDueReminders(?Carbon $referenceDay = null): array
     {
         $referenceDay ??= now();

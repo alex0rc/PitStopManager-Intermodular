@@ -9,7 +9,6 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
-use App\Services\SubscriptionRoleService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session;
@@ -26,7 +25,6 @@ class StripeService
         }
     }
 
-    // --- Checkout ---
     public function createCheckoutForSubscription(User $user, SubscriptionPlan $plan): Session
     {
         return DB::transaction(function () use ($user, $plan) {
@@ -115,7 +113,6 @@ class StripeService
         return $this->handleCheckoutCompleted($session);
     }
 
-    // --- Webhook ---
     public function handleWebhookEvent(string $payload, ?string $sigHeader): array
     {
         $secret = config('services.stripe.webhook_secret');

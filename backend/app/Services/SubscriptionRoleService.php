@@ -8,10 +8,6 @@ use Illuminate\Support\Facades\Log;
 
 class SubscriptionRoleService
 {
-    // --- Caducidad ---
-    /**
-     * @return array{expired: int, demoted: int}
-     */
     public function expireDueSubscriptions(): array
     {
         $expired = 0;

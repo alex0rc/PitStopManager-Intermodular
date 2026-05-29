@@ -4,7 +4,7 @@ import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
-import { environment } from '../../../environments/environment';
+import { adminPanelBaseUrl } from '../../core/utils/admin-panel-url';
 import { BrandLogoComponent } from '../../shared/brand-logo/brand-logo.component';
 
 @Component({
@@ -23,7 +23,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   navbarCollapsed = true;
   userMenuOpen = false;
   year = new Date().getFullYear();
-  readonly adminUrl = environment.adminUrl;
+  readonly adminUrl = adminPanelBaseUrl();
   isAuthRoute = false;
 
   private routerSub?: Subscription;

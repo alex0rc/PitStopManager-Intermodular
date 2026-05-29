@@ -1,11 +1,21 @@
 {
   "/api": {
-    "target": "http://localhost:8000",
+    "target": "https://localhost",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/admin": {
+    "target": "https://localhost",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/sanctum": {
+    "target": "https://localhost",
     "secure": false,
     "changeOrigin": true
   },
   "/storage": {
-    "target": "http://localhost:8000",
+    "target": "https://localhost",
     "secure": false,
     "changeOrigin": true
   }

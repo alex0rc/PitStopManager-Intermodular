@@ -44,7 +44,6 @@ class ChampionshipController extends Controller
         return ChampionshipResource::collection($championships);
     }
 
-    // --- Destacado home ---
     public function featured(WeatherService $weather): JsonResponse
     {
         $championship = Championship::with('category')
@@ -198,10 +197,6 @@ class ChampionshipController extends Controller
         return new ChampionshipResource($championship->fresh()->load('category'));
     }
 
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
     private function applyVenueGeocoding(array $data): array
     {
         if (
@@ -292,7 +287,6 @@ class ChampionshipController extends Controller
         return response()->json(['data' => $standings]);
     }
 
-    // --- Clasificación por carrera ---
     public function raceResults(Championship $championship): JsonResponse
     {
         $races = $championship->races()

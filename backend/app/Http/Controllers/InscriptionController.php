@@ -27,7 +27,6 @@ class InscriptionController extends Controller
 
         $query = $championship->inscriptions()->with(['user', 'races']);
 
-        // --- Visibilidad listado ---
         if (!$isOwner) {
             $query->where(function ($q) use ($user) {
                 $q->where('status', 'confirmed')
@@ -149,7 +148,6 @@ class InscriptionController extends Controller
         $inscription->update(['status' => $request->status]);
         $fresh = $inscription->fresh()->load(['user', 'championship', 'races']);
 
-        // --- Email estado ---
         if (
             in_array($request->status, ['confirmed', 'rejected'], true)
             && $request->status !== $previousStatus
@@ -199,7 +197,6 @@ class InscriptionController extends Controller
 
         $user = $request->user();
 
-        // --- Baja ---
         if ($user->isPilot() && $user->id === $inscription->user_id) {
             $inscription->update(['status' => 'withdrawn']);
             $inscription->races()->detach();

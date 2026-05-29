@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from '../../../../environments/environment';
+import { adminPanelBaseUrl } from '../../../core/utils/admin-panel-url';
 
 @Component({
   selector: 'app-admin-redirect',
@@ -8,7 +8,6 @@ import { environment } from '../../../../environments/environment';
 })
 export class AdminRedirectComponent implements OnInit {
   ngOnInit(): void {
-    const url = environment.adminUrl.replace(/\/$/, '');
-    window.location.href = url.startsWith('http') ? url : `${window.location.origin}${url}`;
+    window.location.href = adminPanelBaseUrl();
   }
 }

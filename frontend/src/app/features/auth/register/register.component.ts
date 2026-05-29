@@ -3,7 +3,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractContro
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { environment } from '../../../../environments/environment';
+import { adminPanelLoginUrl } from '../../../core/utils/admin-panel-url';
 import { BrandLogoComponent } from '../../../shared/brand-logo/brand-logo.component';
 
 @Component({
@@ -76,7 +76,7 @@ export class RegisterComponent {
 
     switch (role) {
       case 'admin':
-        window.location.href = environment.adminUrl.replace(/\/$/, '') + '/login';
+        window.location.href = adminPanelLoginUrl();
         break;
       case 'organizer':
         this.router.navigate(['/organizer/championships']);

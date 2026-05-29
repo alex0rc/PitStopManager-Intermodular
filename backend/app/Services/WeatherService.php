@@ -30,7 +30,7 @@ class WeatherService
             return $cached;
         }
 
-        $response = Http::timeout(12)->get($this->baseUrl, [
+        $response = Http::timeout(4)->get($this->baseUrl, [
             'lat'   => $lat,
             'lon'   => $lng,
             'appid' => $this->apiKey,

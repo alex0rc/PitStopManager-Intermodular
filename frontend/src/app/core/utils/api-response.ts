@@ -1,4 +1,3 @@
-// --- Respuestas API ---
 export function unwrapList<T>(res: T[] | { data?: T[] } | null | undefined): T[] {
   if (!res) return [];
   if (Array.isArray(res)) return res;

@@ -1,4 +1,3 @@
-// --- Estados ---
 export const STATUS_LABELS: Record<string, string> = {
   pending: 'Pendiente',
   confirmed: 'Confirmada',

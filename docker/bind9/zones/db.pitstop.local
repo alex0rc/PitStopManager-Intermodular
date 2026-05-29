@@ -1,0 +1,13 @@
+$TTL 300
+@   IN  SOA ns1.pitstop.local. admin.pitstop.local. (
+        2026051901 ; serial
+        3600       ; refresh
+        600        ; retry
+        86400      ; expire
+        300 )      ; minimum
+
+    IN  NS  ns1.pitstop.local.
+
+ns1     IN  A   127.0.0.1
+@       IN  A   127.0.0.1
+www     IN  A   127.0.0.1

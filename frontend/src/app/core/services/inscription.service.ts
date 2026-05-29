@@ -48,7 +48,6 @@ export class InscriptionService {
     return this.http.patch<Inscription>(`${this.apiUrl}/inscriptions/${id}/status`, { status });
   }
 
-  // --- Baja / eliminación ---
   remove(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/inscriptions/${id}`);
   }

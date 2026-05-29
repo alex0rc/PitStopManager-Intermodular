@@ -78,7 +78,6 @@ class AuthController extends Controller
             if ($accessToken instanceof PersonalAccessToken) {
                 $accessToken->delete();
             } elseif ($bearer = $request->bearerToken()) {
-                // --- Token ---
                 $tokenId = str_contains($bearer, '|')
                     ? (int) explode('|', $bearer, 2)[0]
                     : null;

@@ -61,7 +61,6 @@ class AuthController extends Controller
         return redirect()->route('admin.login')->with('success', 'Sesión cerrada.');
     }
 
-    // --- Puente SPA ---
     public function goToApp(Request $request)
     {
         $user = $request->user();

@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Championship;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class ChampionshipSeeder extends Seeder
 {
@@ -40,6 +42,7 @@ class ChampionshipSeeder extends Seeder
                 'venue_city'      => 'Valencia',
                 'venue_latitude'  => 39.4699,
                 'venue_longitude' => -0.3763,
+                'image_seed'      => 'levante-kart-2026',
             ],
             [
                 'user_id'         => $pedro->id,
@@ -57,6 +60,7 @@ class ChampionshipSeeder extends Seeder
                 'venue_city'      => 'Alicante',
                 'venue_latitude'  => 38.3452,
                 'venue_longitude' => -0.4810,
+                'image_seed'      => 'costa-blanca-kart',
             ],
             [
                 'user_id'         => $maria->id,
@@ -74,6 +78,7 @@ class ChampionshipSeeder extends Seeder
                 'venue_city'      => 'Chiva',
                 'venue_latitude'  => 39.4710,
                 'venue_longitude' => -0.7190,
+                'image_seed'      => 'trofeo-valencia-kart',
             ],
             [
                 'user_id'         => $javier->id,
@@ -91,6 +96,7 @@ class ChampionshipSeeder extends Seeder
                 'venue_city'      => 'Murcia',
                 'venue_latitude'  => 37.9922,
                 'venue_longitude' => -1.1307,
+                'image_seed'      => 'murcia-amateur-kart',
             ],
             [
                 'user_id'         => $maria->id,
@@ -108,6 +114,7 @@ class ChampionshipSeeder extends Seeder
                 'venue_city'      => 'Cheste',
                 'venue_latitude'  => 39.4858,
                 'venue_longitude' => -0.6276,
+                'image_seed'      => 'cadetes-levante-iame',
             ],
             [
                 'user_id'         => $pedro->id,
@@ -125,6 +132,7 @@ class ChampionshipSeeder extends Seeder
                 'venue_city'      => 'Benidorm',
                 'venue_latitude'  => 38.5361,
                 'venue_longitude' => -0.1652,
+                'image_seed'      => 'junior-challenge-bcosta',
             ],
             [
                 'user_id'         => $carlos->id,
@@ -142,18 +150,46 @@ class ChampionshipSeeder extends Seeder
                 'venue_city'      => 'Zuera',
                 'venue_latitude'  => 41.8714,
                 'venue_longitude' => -0.7894,
+                'image_seed'      => 'iberian-kart-tour-ok',
             ],
         ];
 
         foreach ($championships as $row) {
+            $seed = $row['image_seed'];
+            unset($row['image_seed']);
+
             $champ = Championship::updateOrCreate(
                 ['name' => $row['name'], 'season_year' => $row['season_year']],
                 $row
             );
 
+            if (empty($champ->image)) {
+                $image = $this->downloadImage(
+                    "https://picsum.photos/seed/{$seed}/900/500",
+                    'championships',
+                    "{$seed}.jpg"
+                );
+                if ($image) {
+                    $champ->update(['image' => $image]);
+                }
+            }
+
             if ($row['name'] === 'Liga Levante Karting '.$year) {
                 $champ->touch();
             }
         }
+    }
+
+    private function downloadImage(string $url, string $folder, string $filename): ?string
+    {
+        try {
+            $response = Http::timeout(10)->get($url);
+            if ($response->successful()) {
+                $path = "{$folder}/{$filename}";
+                Storage::disk('public')->put($path, $response->body());
+                return $path;
+            }
+        } catch (\Throwable) {}
+        return null;
     }
 }

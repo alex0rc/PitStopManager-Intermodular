@@ -117,7 +117,7 @@ class CircuitController extends Controller
 
         $data = $this->applyGeocoding($request->validated());
 
-        // --- Estado circuito ---
+        // Organizers can't manually set status; re-submit rejected as pending
         if ($request->user()->isOrganizer() && !$request->user()->isAdmin()) {
             if ($circuit->status === 'rejected') {
                 $data['status'] = 'pending';
@@ -154,10 +154,6 @@ class CircuitController extends Controller
         return new CircuitResource($circuit->fresh());
     }
 
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
     private function applyGeocoding(array $data): array
     {
         if (

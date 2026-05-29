@@ -40,7 +40,6 @@ export class SubscriptionService {
     );
   }
 
-  // --- Checkout ---
   confirmCheckout(sessionId: string): Observable<{ message: string; role?: string }> {
     return this.http.post<{ message: string; role?: string }>(
       `${this.apiUrl}/subscriptions/confirm`,

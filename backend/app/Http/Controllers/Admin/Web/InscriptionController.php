@@ -25,12 +25,17 @@ class InscriptionController extends Controller
 
         $inscriptions = $query->get();
 
+        $counts = $championship->inscriptions()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
         $stats = [
-            'total'     => $championship->inscriptions()->count(),
-            'pending'   => $championship->inscriptions()->where('status', 'pending')->count(),
-            'confirmed' => $championship->inscriptions()->where('status', 'confirmed')->count(),
-            'rejected'  => $championship->inscriptions()->where('status', 'rejected')->count(),
-            'withdrawn' => $championship->inscriptions()->where('status', 'withdrawn')->count(),
+            'total'     => $counts->sum(),
+            'pending'   => $counts->get('pending', 0),
+            'confirmed' => $counts->get('confirmed', 0),
+            'rejected'  => $counts->get('rejected', 0),
+            'withdrawn' => $counts->get('withdrawn', 0),
         ];
 
         $races = $championship->races()->orderBy('scheduled_at')->get(['id', 'name', 'status']);

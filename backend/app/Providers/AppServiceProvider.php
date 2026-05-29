@@ -15,6 +15,7 @@ use App\Policies\ResultPolicy;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +27,20 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (! $this->app->runningInConsole() && $request = request()) {
+            URL::forceRootUrl($request->getSchemeAndHttpHost());
+
+            $host = $request->getHost();
+            if (in_array($host, ['localhost', '127.0.0.1'], true)) {
+                config([
+                    'session.domain' => null,
+                    'session.secure' => $request->isSecure(),
+                ]);
+            } elseif ($request->isSecure()) {
+                config(['session.secure' => true]);
+            }
+        }
+
         Paginator::useBootstrapFive();
         Paginator::defaultView('admin.partials.pagination');
 

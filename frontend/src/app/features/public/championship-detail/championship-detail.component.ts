@@ -78,8 +78,7 @@ export class ChampionshipDetailComponent implements OnInit {
         this.races = races;
         this.racesLoading = false;
       },
-      error: (err) => {
-        console.error('Error loading races', err);
+      error: () => {
         this.racesLoading = false;
       },
     });

@@ -24,7 +24,6 @@ export class AuthService {
     }
   }
 
-  // --- Sesión ---
   private validateSession(): void {
     if (!this.token) {
       return;
