@@ -1,0 +1,102 @@
+<div class="auth-shell">
+  <aside class="auth-aside">
+    <div class="auth-aside-inner">
+      <a routerLink="/" class="auth-brand">
+        <app-brand-logo size="lg" />
+        <span>
+          Pit<span class="brand-accent">Stop</span>
+          <small>Manager</small>
+        </span>
+      </a>
+
+      <div class="auth-aside-content">
+        <span class="aside-eyebrow"><i class="bi bi-lightning-charge-fill"></i> Bienvenido de nuevo</span>
+        <h2>Sube al podio.<br />Tu próxima carrera te espera.</h2>
+        <p>Accede a tu cuenta para gestionar campeonatos, inscribirte en carreras y revisar tus resultados.</p>
+
+        <div class="aside-features">
+          <div class="aside-feature"><i class="bi bi-check2-circle"></i> Inscripciones en un clic</div>
+          <div class="aside-feature"><i class="bi bi-check2-circle"></i> Clasificaciones en vivo</div>
+          <div class="aside-feature"><i class="bi bi-check2-circle"></i> Meteorología por circuito</div>
+        </div>
+      </div>
+
+      <div class="auth-aside-footer">
+        <small>© {{ year }} PitStop Manager</small>
+      </div>
+    </div>
+  </aside>
+
+  <section class="auth-form-wrap">
+    <div class="auth-form-card fade-in-up">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold mb-1">Iniciar sesión</h3>
+        <p class="text-muted-2 mb-0">Bienvenido de vuelta a la pista</p>
+      </div>
+
+      @if (error) {
+        <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+          <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+          <div class="flex-grow-1">{{ error }}</div>
+          <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-group input-group-icon">
+            <span class="input-icon"><i class="bi bi-envelope"></i></span>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              formControlName="email"
+              placeholder="tu@email.com"
+              autocomplete="email"
+              [class.is-invalid]="form.get('email')!.touched && form.get('email')!.invalid"
+            />
+          </div>
+          @if (form.get('email')!.touched && form.get('email')!.hasError('required')) {
+            <div class="form-text text-danger">El email es obligatorio.</div>
+          }
+          @if (form.get('email')!.touched && form.get('email')!.hasError('email')) {
+            <div class="form-text text-danger">Introduce un email válido.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-group input-group-icon">
+            <span class="input-icon"><i class="bi bi-lock"></i></span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              class="form-control"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              [class.is-invalid]="form.get('password')!.touched && form.get('password')!.invalid"
+            />
+            <button type="button" class="input-eye" (click)="showPassword = !showPassword" tabindex="-1" aria-label="Mostrar contraseña">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          @if (form.get('password')!.touched && form.get('password')!.hasError('required')) {
+            <div class="form-text text-danger">La contraseña es obligatoria.</div>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 btn-icon justify-content-center" [disabled]="form.invalid || loading">
+          @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
+          @else { <i class="bi bi-box-arrow-in-right"></i> }
+          {{ loading ? 'Entrando...' : 'Iniciar sesión' }}
+        </button>
+      </form>
+
+      <p class="text-center mt-4 mb-0 text-muted-2">
+        ¿No tienes cuenta? <a routerLink="/register" class="fw-semibold">Regístrate gratis</a>
+      </p>
+    </div>
+  </section>
+</div>

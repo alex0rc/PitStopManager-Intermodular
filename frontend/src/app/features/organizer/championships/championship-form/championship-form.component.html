@@ -1,0 +1,188 @@
+<div class="container py-4">
+  <h2>{{ isEdit ? 'Editar Campeonato' : 'Nuevo Campeonato' }}</h2>
+
+  @if (!isEdit && quota) {
+    <div class="alert alert-info mt-3 mb-0">
+      Plan <strong>{{ quota.plan_name }}</strong>:
+      {{ quota.current_championships }} / {{ quota.max_championships }} campeonatos activos
+      · {{ quota.days_remaining }} días de suscripción restantes
+    </div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger alert-dismissible fade show mt-3">
+      {{ error }}
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+    </div>
+  }
+
+  @if (loadingData) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="name" class="form-label">Nombre *</label>
+          <input id="name" type="text" class="form-control" formControlName="name"
+                 [class.is-invalid]="isInvalid('name')">
+          @if (isInvalid('name')) {
+            <div class="invalid-feedback">El nombre es obligatorio.</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="category_id" class="form-label">Categoría *</label>
+          <select id="category_id" class="form-select" formControlName="category_id"
+                  [class.is-invalid]="isInvalid('category_id')">
+            <option [ngValue]="null" disabled>Seleccionar categoría</option>
+            @for (cat of categories; track cat.id) {
+              <option [ngValue]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+          @if (isInvalid('category_id')) {
+            <div class="invalid-feedback">La categoría es obligatoria.</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="kart_modality" class="form-label">Modalidad de kart *</label>
+          <select id="kart_modality" class="form-select" formControlName="kart_modality">
+            <option value="rental">Karts de alquiler (circuito)</option>
+            <option value="own">Kart propio del piloto</option>
+          </select>
+          <div class="form-text">La mayoría de campeonatos amateur usan alquiler.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="engine_class" class="form-label">Clase de motor / equipamiento</label>
+          <input id="engine_class" type="text" class="form-control" formControlName="engine_class"
+                 placeholder="Ej. Rental 390cc, Rotax Mini Max, IAME X30">
+        </div>
+
+        <div class="col-12">
+          <label for="description" class="form-label">Descripción</label>
+          <textarea id="description" class="form-control" formControlName="description" rows="3"></textarea>
+        </div>
+
+        <div class="col-md-4">
+          <label for="season_year" class="form-label">Temporada *</label>
+          <input id="season_year" type="number" class="form-control" formControlName="season_year"
+                 [class.is-invalid]="isInvalid('season_year')">
+          @if (isInvalid('season_year')) {
+            <div class="invalid-feedback">La temporada es obligatoria (2000-2100).</div>
+          }
+        </div>
+
+        <div class="col-md-4">
+          <label for="start_date" class="form-label">Fecha de inicio</label>
+          <input id="start_date" type="date" class="form-control" formControlName="start_date">
+        </div>
+
+        <div class="col-md-4">
+          <label for="end_date" class="form-label">Fecha de fin</label>
+          <input id="end_date" type="date" class="form-control" formControlName="end_date">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Imagen del campeonato</label>
+          <div class="d-flex flex-wrap align-items-center gap-3">
+            @if (imagePreview) {
+              <img [src]="imagePreview" alt="Vista previa" class="rounded border" style="max-height:120px;max-width:200px;object-fit:cover" />
+            }
+            <input type="file" id="champImage" class="form-control" style="max-width:280px" accept="image/*" (change)="onImageSelected($event)" />
+          </div>
+          <div class="form-text">Opcional. Se usa en el detalle público y listados.</div>
+        </div>
+
+        <div class="col-12 mt-2">
+          <h5 class="h6 fw-bold mb-2">Ubicación base (clima OpenWeather)</h5>
+          <p class="form-text mb-2">Si aún no tienes circuito aprobado, define ciudad para el tiempo en el campeonato.</p>
+        </div>
+
+        <div class="col-md-4">
+          <label for="venue_country" class="form-label">País</label>
+          <select id="venue_country" class="form-select" formControlName="venue_country" (change)="onCountryChange()">
+            <option value="">— Seleccionar —</option>
+            @for (c of countries; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="venue_province" class="form-label">Provincia</label>
+          <select id="venue_province" class="form-select" formControlName="venue_province" (change)="onProvinceChange()" [disabled]="!provinces.length">
+            <option value="">— Seleccionar —</option>
+            @for (p of provinces; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="venue_city" class="form-label">Ciudad / localidad</label>
+          <select id="venue_city" class="form-select" formControlName="venue_city" [disabled]="!provinces.length">
+            <option value="">— Seleccionar —</option>
+            @for (city of cities; track city) {
+              <option [value]="city">{{ city }}</option>
+            }
+            <option [value]="otherCityValue">— Otra (escribir) —</option>
+          </select>
+        </div>
+
+        @if (showCustomVenueCity) {
+          <div class="col-md-6">
+            <label for="customVenueCity" class="form-label">Nombre de ciudad</label>
+            <input id="customVenueCity" type="text" class="form-control" [(ngModel)]="customVenueCity"
+                   [ngModelOptions]="{ standalone: true }" />
+          </div>
+        }
+
+        <div class="col-12">
+          <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+            <span class="fw-semibold small">Coordenadas en mapa</span>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="fetchCoordinates()" [disabled]="geocoding">
+              @if (geocoding) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              }
+              <i class="bi bi-search me-1"></i>Centrar por ciudad
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <label for="venue_latitude" class="form-label">Latitud</label>
+          <input id="venue_latitude" type="number" step="any" class="form-control" formControlName="venue_latitude">
+        </div>
+
+        <div class="col-md-3">
+          <label for="venue_longitude" class="form-label">Longitud</label>
+          <input id="venue_longitude" type="number" step="any" class="form-control" formControlName="venue_longitude">
+        </div>
+
+        <div class="col-12">
+          <app-map-picker
+            [latitude]="form.get('venue_latitude')?.value"
+            [longitude]="form.get('venue_longitude')?.value"
+            [center]="mapCenter"
+            (coordinatesChange)="onMapCoordinates($event)"
+          />
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="loading || !canSubmit">
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ isEdit ? 'Actualizar' : 'Crear' }}
+        </button>
+        <a routerLink="/organizer/championships" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  }
+</div>

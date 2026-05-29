@@ -1,0 +1,166 @@
+<div class="container py-4">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">¡Hola, {{ firstName }}!</h1>
+      <p class="page-subtitle">Tu pista de despegue para gestionar inscripciones, resultados y carreras.</p>
+    </div>
+    <a routerLink="/championships" class="btn btn-primary btn-icon">
+      <i class="bi bi-search"></i> Explorar campeonatos
+    </a>
+  </header>
+
+  @if (loadError) {
+    <div class="alert alert-warning" role="alert">{{ loadError }}</div>
+  }
+
+  <!-- Banner upgrade -->
+  <section class="upgrade-banner mb-4">
+    <div class="upgrade-decor"></div>
+    <div class="upgrade-content">
+      <div>
+        <span class="upgrade-eyebrow"><i class="bi bi-lightning-charge-fill"></i> Conviértete en organizador</span>
+        <h3>Crea tus propios campeonatos</h3>
+        <p>Activa una suscripción y publica campeonatos, gestiona inscripciones y registra resultados en minutos.</p>
+      </div>
+      <a routerLink="/pilot/upgrade" class="btn btn-light btn-lg btn-icon">
+        <i class="bi bi-rocket-takeoff"></i> Ver planes
+      </a>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card card card-hover">
+        <div class="stat-icon icon-blue"><i class="bi bi-ticket-perforated"></i></div>
+        <div>
+          <span class="stat-label">Inscripciones</span>
+          <span class="stat-value">@if (loading) { <span class="skeleton" style="width:48px;height:24px;"></span> } @else { {{ totalInscriptions }} }</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card card card-hover">
+        <div class="stat-icon icon-green"><i class="bi bi-check2-circle"></i></div>
+        <div>
+          <span class="stat-label">Confirmadas</span>
+          <span class="stat-value">@if (loading) { <span class="skeleton" style="width:48px;height:24px;"></span> } @else { {{ confirmedCount }} }</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card card card-hover">
+        <div class="stat-icon icon-amber"><i class="bi bi-hourglass-split"></i></div>
+        <div>
+          <span class="stat-label">Pendientes</span>
+          <span class="stat-value">@if (loading) { <span class="skeleton" style="width:48px;height:24px;"></span> } @else { {{ pendingCount }} }</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card card card-hover">
+        <div class="stat-icon icon-red"><i class="bi bi-trophy"></i></div>
+        <div>
+          <span class="stat-label">Abiertos</span>
+          <span class="stat-value">@if (loading) { <span class="skeleton" style="width:48px;height:24px;"></span> } @else { {{ openChampionships.length }} }</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bloques -->
+  <div class="row g-4">
+    <!-- Recent inscriptions -->
+    <div class="col-lg-7">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-ticket-perforated me-2 text-muted-2"></i> Mis inscripciones recientes</span>
+          <a routerLink="/pilot/inscriptions" class="btn btn-sm btn-outline-primary">Ver todas</a>
+        </div>
+        <div class="card-body p-0">
+          @if (loading) {
+            <div class="p-4 d-flex flex-column gap-2">
+              <span class="skeleton" style="height:22px; width:80%"></span>
+              <span class="skeleton" style="height:22px; width:60%"></span>
+              <span class="skeleton" style="height:22px; width:70%"></span>
+            </div>
+          } @else if (!inscriptions.length) {
+            <div class="empty-state">
+              <div class="empty-icon"><i class="bi bi-flag"></i></div>
+              <h5>Aún no te has inscrito</h5>
+              <p>Explora los campeonatos abiertos y reserva tu plaza en la parrilla.</p>
+              <a routerLink="/championships" class="btn btn-primary btn-icon mt-2">
+                <i class="bi bi-search"></i> Explorar
+              </a>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Campeonato</th>
+                    <th>Inscrito</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (insc of recentInscriptions(); track insc.id) {
+                    <tr>
+                      <td>
+                        <a [routerLink]="['/championships', insc.championship_id]" class="fw-semibold">
+                          {{ insc.championship?.name || 'Campeonato' }}
+                        </a>
+                      </td>
+                      <td><span class="text-muted-2 small">{{ insc.created_at | date:'mediumDate' }}</span></td>
+                      <td><span [class]="inscriptionStatusClass(insc.status)">{{ inscriptionStatusLabel(insc.status) }}</span></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Campeonatos abiertos -->
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-trophy me-2 text-muted-2"></i> Campeonatos abiertos</span>
+          <a routerLink="/championships" class="btn btn-sm btn-outline-primary">Ver todos</a>
+        </div>
+        <div class="card-body">
+          @if (loading) {
+            <div class="d-flex flex-column gap-2">
+              <span class="skeleton" style="height:48px"></span>
+              <span class="skeleton" style="height:48px"></span>
+              <span class="skeleton" style="height:48px"></span>
+            </div>
+          } @else if (!openChampionships.length) {
+            <div class="empty-state">
+              <div class="empty-icon"><i class="bi bi-trophy"></i></div>
+              <h5>Sin campeonatos por ahora</h5>
+              <p>Vuelve pronto, los organizadores están preparando nuevas competiciones.</p>
+            </div>
+          } @else {
+            <ul class="quick-list">
+              @for (champ of openChampionships; track champ.id) {
+                <li>
+                  <a [routerLink]="['/championships', champ.id]">
+                    <span class="quick-list-title">
+                      <i class="bi bi-flag-fill"></i> {{ champ.name }}
+                    </span>
+                    <span class="quick-list-meta">
+                      {{ champ.season_year }} · {{ champ.category?.name || 'Categoría' }}
+                    </span>
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

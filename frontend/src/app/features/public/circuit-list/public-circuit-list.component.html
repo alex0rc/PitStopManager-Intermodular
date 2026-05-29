@@ -1,0 +1,77 @@
+<div class="container py-4">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Circuitos</h1>
+      <p class="page-subtitle">Pistas aprobadas del catálogo. Consulta ubicación, longitud y tiempo en cada ficha.</p>
+    </div>
+    @if (!loading && circuits.length) {
+      <span class="badge rounded-pill bg-theme-subtle">
+        <i class="bi bi-pin-map me-1"></i> {{ circuits.length }} disponibles
+      </span>
+    }
+  </header>
+
+  <div class="card mb-4">
+    <div class="card-body row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Provincia</label>
+        <select class="form-select" [(ngModel)]="filterProvince" (change)="applyFilter()">
+          <option value="">Todas</option>
+          @for (p of provinces; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (error) {
+    <div class="alert alert-danger d-flex justify-content-between align-items-center">
+      <span>{{ error }}</span>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="load()">Reintentar</button>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="row g-3">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100"><span class="skeleton d-block" style="height:160px"></span></div>
+        </div>
+      }
+    </div>
+  } @else if (!circuits.length) {
+    <div class="empty-state card border-0 shadow-sm">
+      <div class="empty-icon"><i class="bi bi-pin-map"></i></div>
+      <h5>No hay circuitos en esta zona</h5>
+      <p>Prueba otra provincia o vuelve más tarde.</p>
+    </div>
+  } @else {
+    <div class="row g-3">
+      @for (c of circuits; track c.id) {
+        <div class="col-md-6 col-lg-4">
+          <a [routerLink]="['/circuits', c.id]" class="circuit-card-link">
+            <article class="card circuit-card h-100 hover-lift">
+              <div class="circuit-card-media">
+                @if (c.image) {
+                  <img [src]="c.image" [alt]="c.name" class="circuit-card-img" />
+                } @else {
+                  <div class="circuit-card-placeholder"><i class="bi bi-pin-map"></i></div>
+                }
+              </div>
+              <div class="card-body">
+                <h2 class="h6 fw-bold mb-1">{{ c.name }}</h2>
+                <p class="small text-muted mb-0">
+                  <i class="bi bi-geo-alt me-1"></i>{{ c.province || '—' }} · {{ c.city || c.location }}
+                </p>
+                @if (c.length_meters) {
+                  <span class="badge bg-theme-subtle small mt-2">{{ c.length_meters }} m</span>
+                }
+              </div>
+            </article>
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>

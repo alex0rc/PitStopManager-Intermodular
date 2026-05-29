@@ -1,0 +1,146 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Circuitos</h2>
+    <a routerLink="/organizer/circuits/new" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i> Proponer circuito
+    </a>
+  </div>
+
+  <p class="text-muted">
+    El <strong>catálogo</strong> son pistas aprobadas para todos. Tus <strong>propuestas</strong> las revisa un administrador antes de publicarse.
+  </p>
+
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <button type="button" class="nav-link" [class.active]="activeTab === 'catalog'" (click)="setTab('catalog')">
+        Catálogo (aprobados)
+      </button>
+    </li>
+    <li class="nav-item">
+      <button type="button" class="nav-link" [class.active]="activeTab === 'mine'" (click)="setTab('mine')">
+        Mis propuestas
+      </button>
+    </li>
+  </ul>
+
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  @if (activeTab === 'catalog') {
+    <div class="card mb-3">
+      <div class="card-body row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Filtrar por provincia</label>
+          <select class="form-select" [(ngModel)]="filterProvince" (change)="applyProvinceFilter()">
+            <option value="">Todas las provincias</option>
+            @for (p of provinces; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-outline-primary" (click)="applyProvinceFilter()">Buscar</button>
+        </div>
+      </div>
+    </div>
+
+    @if (loading) {
+      <div class="row g-3">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="col-md-6 col-lg-4">
+            <div class="card circuit-card h-100">
+              <span class="skeleton circuit-card-img-skeleton"></span>
+              <div class="card-body">
+                <span class="skeleton d-block mb-2" style="height:20px;width:70%"></span>
+                <span class="skeleton d-block" style="height:14px;width:50%"></span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (catalogCircuits.length === 0) {
+      <div class="alert alert-info">No hay circuitos aprobados en esta provincia.</div>
+    } @else {
+      <div class="row g-3">
+        @for (c of catalogCircuits; track c.id) {
+          <div class="col-md-6 col-lg-4">
+            <a [routerLink]="['/circuits', c.id]" class="circuit-card-link">
+              <article class="card circuit-card h-100 hover-lift">
+                <div class="circuit-card-media">
+                  @if (c.image) {
+                    <img [src]="c.image" [alt]="c.name" class="circuit-card-img" />
+                  } @else {
+                    <div class="circuit-card-placeholder">
+                      <i class="bi bi-pin-map"></i>
+                    </div>
+                  }
+                </div>
+                <div class="card-body">
+                  <h3 class="h6 fw-bold mb-1">{{ c.name }}</h3>
+                  <p class="small text-muted mb-1">
+                    <i class="bi bi-geo-alt me-1"></i>{{ c.province || '—' }} · {{ c.city || c.location }}
+                  </p>
+                  @if (c.length_meters) {
+                    <span class="badge bg-theme-subtle small">{{ c.length_meters }} m</span>
+                  }
+                  <span class="circuit-card-cta small">
+                    Ver detalle <i class="bi bi-arrow-right"></i>
+                  </span>
+                </div>
+              </article>
+            </a>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  @if (activeTab === 'mine') {
+    @if (loading) {
+      <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+    } @else if (myCircuits.length === 0) {
+      <div class="alert alert-info">Aún no has propuesto ningún circuito.</div>
+    } @else {
+      <div class="row g-3">
+        @for (c of myCircuits; track c.id) {
+          <div class="col-md-6 col-lg-4">
+            <article class="card circuit-card h-100">
+              <a [routerLink]="['/circuits', c.id]" class="circuit-card-link-block">
+                <div class="circuit-card-media">
+                  @if (c.image) {
+                    <img [src]="c.image" [alt]="c.name" class="circuit-card-img" />
+                  } @else {
+                    <div class="circuit-card-placeholder">
+                      <i class="bi bi-pin-map"></i>
+                    </div>
+                  }
+                  <span class="badge circuit-status-overlay" [class]="statusBadge(c.status)">
+                    {{ statusLabel(c.status) }}
+                  </span>
+                </div>
+                <div class="card-body pb-2">
+                  <h3 class="h6 fw-bold mb-1">{{ c.name }}</h3>
+                  <p class="small text-muted mb-0">{{ c.province || '—' }}</p>
+                </div>
+              </a>
+              <div class="card-footer bg-transparent border-0 pt-0 px-3 pb-3 d-flex flex-wrap gap-2">
+                <a [routerLink]="['/circuits', c.id]" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye me-1"></i>Ver
+                </a>
+                @if (canEdit(c)) {
+                  <a [routerLink]="['/organizer/circuits', c.id, 'edit']" class="btn btn-sm btn-outline-warning">Editar</a>
+                  <label class="btn btn-sm btn-outline-secondary mb-0">
+                    <i class="bi bi-image me-1"></i>Imagen
+                    <input type="file" class="d-none" accept="image/*" (change)="onUploadImage($event, c)" />
+                  </label>
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteCircuit(c.id)">Eliminar</button>
+                }
+              </div>
+            </article>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

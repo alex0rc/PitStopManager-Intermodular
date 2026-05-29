@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreCategoryRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name'          => ['required', 'string', 'max:255', 'unique:categories,name'],
+            'description'   => ['nullable', 'string'],
+            'min_age'       => ['nullable', 'integer', 'min:0'],
+            'max_age'       => ['nullable', 'integer', 'min:0'],
+            'max_weight_kg' => ['nullable', 'integer', 'min:0'],
+        ];
+    }
+}

@@ -1,0 +1,313 @@
+<div class="container py-4">
+  @if (loading) {
+    <div class="card mb-4">
+      <span class="skeleton" style="height:240px;display:block"></span>
+      <div class="card-body">
+        <span class="skeleton" style="height:32px;width:60%;display:block;margin-bottom:10px"></span>
+        <span class="skeleton" style="height:18px;width:40%;display:block;margin-bottom:6px"></span>
+        <span class="skeleton" style="height:18px;width:80%;display:block"></span>
+      </div>
+    </div>
+  }
+
+  @if (error) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-exclamation-triangle text-danger fs-1 d-block mb-3"></i>
+        <h2 class="h5 fw-bold">No se pudo mostrar el campeonato</h2>
+        <p class="text-muted mb-4">{{ error }}</p>
+        <a routerLink="/championships" class="btn btn-danger">
+          <i class="bi bi-arrow-left me-1"></i> Volver a campeonatos
+        </a>
+      </div>
+    </div>
+  }
+
+  @if (!loading && championship) {
+    <a routerLink="/championships" class="back-link mb-3 d-inline-flex align-items-center gap-1">
+      <i class="bi bi-arrow-left"></i> Volver a campeonatos
+    </a>
+
+    <!-- Hero -->
+    <section class="champ-hero mb-4">
+      <div class="champ-hero-image">
+        @if (championship.image) {
+          <img [src]="championship.image" [alt]="championship.name" />
+        } @else {
+          <div class="placeholder-art"><img src="/logo.png" alt="" class="placeholder-logo" /></div>
+        }
+        <div class="champ-hero-fade"></div>
+      </div>
+
+      <div class="champ-hero-content">
+        <div class="champ-meta">
+          @if (championship.category) {
+            <span class="badge bg-theme-subtle"><i class="bi bi-tag me-1"></i> {{ championship.category.name }}</span>
+          }
+          <span class="badge bg-theme-subtle"><i class="bi bi-calendar me-1"></i> Temporada {{ championship.season_year }}</span>
+          <span class="badge bg-theme-subtle">
+            <i class="bi bi-{{ championship.kart_modality === 'own' ? 'wrench' : 'shop' }} me-1"></i>
+            {{ championship.kart_modality === 'own' ? 'Kart propio' : 'Alquiler' }}
+          </span>
+          @if (championship.engine_class) {
+            <span class="badge bg-theme-subtle"><i class="bi bi-gear me-1"></i> {{ championship.engine_class }}</span>
+          }
+          <span class="status-pill status-{{ championship.status }}">{{ statusLabel(championship.status) }}</span>
+        </div>
+
+        <h1 class="champ-title">{{ championship.name }}</h1>
+
+        @if (championship.start_date) {
+          <p class="champ-dates">
+            <i class="bi bi-calendar2-week"></i>
+            {{ championship.start_date | date:'longDate' }}
+            @if (championship.end_date) { — {{ championship.end_date | date:'longDate' }} }
+          </p>
+        }
+
+        @if (championship.description) {
+          <p class="champ-desc">{{ championship.description }}</p>
+        }
+
+        <app-championship-inscribe [championship]="championship" layout="hero" />
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tab-bar mb-3">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'races'"
+        (click)="switchTab('races')"
+      >
+        <i class="bi bi-flag"></i> Carreras
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'standings'"
+        (click)="switchTab('standings')"
+      >
+        <i class="bi bi-bar-chart"></i> Clasificación
+      </button>
+    </div>
+
+    <!-- Carreras -->
+    @if (activeTab === 'races') {
+      @if (racesLoading) {
+        <div class="card"><div class="card-body"><span class="skeleton" style="height:120px;width:100%;display:block"></span></div></div>
+      } @else if (!races.length) {
+        <div class="card">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+            <h5>Sin carreras programadas</h5>
+            <p>El organizador todavía no ha registrado carreras para este campeonato.</p>
+          </div>
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Carrera</th>
+                <th>Circuito</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Clima</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (race of races; track race.id) {
+                <tr>
+                  <td class="fw-semibold">{{ race.name }}</td>
+                  <td>
+                    @if (race.circuit) {
+                      <span class="fw-semibold">{{ race.circuit.name }}</span>
+                      @if (race.circuit.city) {
+                        <small class="d-block text-muted-2">{{ race.circuit.city }}</small>
+                      }
+                    } @else {
+                      <span class="text-muted-2">—</span>
+                    }
+                  </td>
+                  <td><span class="text-muted-2">{{ race.scheduled_at | date:'dd MMM yyyy · HH:mm' }}</span></td>
+                  <td><span class="status-pill status-{{ race.status }}">{{ raceStatusLabel(race.status) }}</span></td>
+                  <td>
+                    @if (race.circuit?.latitude && race.circuit?.longitude) {
+                      @if (weatherCache[race.id]; as weather) {
+                        <div class="weather-chip">
+                          <i class="bi bi-cloud-sun"></i>
+                          <span class="weather-temp">{{ weather.temperature }}°C</span>
+                          <small>{{ weather.description }}</small>
+                          @if (weather.wind_speed !== null) {
+                            <small class="d-block text-muted-2">Viento {{ weather.wind_speed }} km/h</small>
+                          }
+                        </div>
+                      } @else if (weatherLoading[race.id]) {
+                        <span class="spinner-border spinner-border-sm"></span>
+                      } @else if (weatherError[race.id]) {
+                        <small class="text-danger">{{ weatherError[race.id] }}</small>
+                      } @else {
+                        <button class="btn btn-sm btn-outline-primary btn-icon" (click)="loadWeather(race)">
+                          <i class="bi bi-cloud-sun"></i> Ver clima
+                        </button>
+                      }
+                    } @else {
+                      <span class="text-muted-2">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (race.status === 'completed') {
+                      <button type="button" class="btn btn-sm btn-outline-primary btn-icon" (click)="showRaceStandings(race.id)">
+                        <i class="bi bi-list-ol"></i> Resultados
+                      </button>
+                    } @else {
+                      <span class="text-muted-2">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+
+    <!-- Clasificación -->
+    @if (activeTab === 'standings') {
+      <section class="standings-section mb-4">
+        <h3 class="standings-section-title">
+          <i class="bi bi-trophy"></i> Clasificación del campeonato
+        </h3>
+        <p class="standings-section-lead">Puntos acumulados en todas las carreras.</p>
+
+        @if (standingsLoading) {
+          <div class="card"><div class="card-body"><span class="skeleton" style="height:120px;width:100%;display:block"></span></div></div>
+        } @else if (!standings.length) {
+          <div class="card">
+            <div class="empty-state py-4">
+              <div class="empty-icon"><i class="bi bi-bar-chart"></i></div>
+              <h5>Sin clasificación general</h5>
+              <p>Aún no hay puntos acumulados en este campeonato.</p>
+            </div>
+          </div>
+        } @else {
+          <div class="table-wrap">
+            <table class="table standings-table">
+              <thead>
+                <tr>
+                  <th style="width: 80px">Pos.</th>
+                  <th>Piloto</th>
+                  <th class="text-end" style="width: 140px">Puntos</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (entry of standings; track entry.user_id; let i = $index) {
+                  <tr [class.top-3]="i < 3">
+                    <td class="position-cell">
+                      @if (i === 0) {
+                        <span class="medal gold"><i class="bi bi-trophy-fill"></i></span>
+                      } @else if (i === 1) {
+                        <span class="medal silver"><i class="bi bi-trophy-fill"></i></span>
+                      } @else if (i === 2) {
+                        <span class="medal bronze"><i class="bi bi-trophy-fill"></i></span>
+                      } @else {
+                        <span class="rank">{{ i + 1 }}</span>
+                      }
+                    </td>
+                    <td class="fw-semibold">{{ entry.pilot_name }}</td>
+                    <td class="text-end fw-bold points">{{ entry.total_points }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+
+      <section class="standings-section">
+        <h3 class="standings-section-title">
+          <i class="bi bi-flag"></i> Clasificación por carrera
+        </h3>
+        <p class="standings-section-lead">Resultados y podio de cada carrera disputada.</p>
+
+        @if (raceResultsLoading) {
+          <div class="card"><div class="card-body"><span class="skeleton" style="height:160px;width:100%;display:block"></span></div></div>
+        } @else if (!raceResults.length) {
+          <div class="card">
+            <div class="empty-state py-4">
+              <div class="empty-icon"><i class="bi bi-calendar-check"></i></div>
+              <h5>Sin resultados por carrera</h5>
+              <p>Cuando el organizador publique resultados, aparecerán aquí.</p>
+            </div>
+          </div>
+        } @else {
+          <div class="race-results-list">
+            @for (block of raceResults; track block.race_id) {
+              <div class="race-result-card" [class.expanded]="expandedRaceId === block.race_id">
+                <button
+                  type="button"
+                  class="race-result-header"
+                  (click)="toggleRaceExpand(block.race_id)"
+                >
+                  <div>
+                    <strong>{{ block.race_name }}</strong>
+                    @if (block.circuit_name) {
+                      <small class="d-block text-muted-2">{{ block.circuit_name }}</small>
+                    }
+                  </div>
+                  <div class="race-result-meta">
+                    <span class="text-muted-2">{{ block.scheduled_at | date:'dd MMM yyyy' }}</span>
+                    <span class="status-pill status-{{ block.status }}">{{ raceStatusLabel(block.status) }}</span>
+                    <i class="bi" [class.bi-chevron-down]="expandedRaceId !== block.race_id" [class.bi-chevron-up]="expandedRaceId === block.race_id"></i>
+                  </div>
+                </button>
+
+                @if (expandedRaceId === block.race_id) {
+                  <div class="race-result-body">
+                    <table class="table standings-table mb-0">
+                      <thead>
+                        <tr>
+                          <th style="width: 70px">Pos.</th>
+                          <th>Piloto</th>
+                          <th>Mejor vuelta</th>
+                          <th>Tiempo total</th>
+                          <th class="text-end">Pts</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (row of block.results; track row.user_id; let i = $index) {
+                          <tr [class.top-3]="i < 3 && !row.dnf && !row.dsq">
+                            <td class="position-cell">
+                              @if (row.dnf || row.dsq) {
+                                <span class="badge-status">{{ resultStatusLabel(row.dnf, row.dsq) }}</span>
+                              } @else if (i === 0) {
+                                <span class="medal gold"><i class="bi bi-trophy-fill"></i></span>
+                              } @else if (i === 1) {
+                                <span class="medal silver"><i class="bi bi-trophy-fill"></i></span>
+                              } @else if (i === 2) {
+                                <span class="medal bronze"><i class="bi bi-trophy-fill"></i></span>
+                              } @else {
+                                <span class="rank">{{ row.position ?? i + 1 }}</span>
+                              }
+                            </td>
+                            <td class="fw-semibold">{{ pilotDisplayName(row.pilot_name) }}</td>
+                            <td>{{ row.best_lap_time || '—' }}</td>
+                            <td>{{ row.total_time || '—' }}</td>
+                            <td class="text-end fw-bold">{{ row.points }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

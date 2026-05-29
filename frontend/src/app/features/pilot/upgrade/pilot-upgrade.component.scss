@@ -1,0 +1,122 @@
+:host { display: block; }
+
+.back-link {
+  color: var(--ps-text-muted);
+  font-size: 0.85rem;
+
+  &:hover { color: var(--ps-primary); text-decoration: none; }
+}
+
+.benefits-card {
+  background: var(--ps-surface);
+  border: 1px solid var(--ps-border);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+
+  strong { display: block; line-height: 1.2; }
+}
+
+.benefit-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+
+  &.icon-red   { background: rgba(225, 29, 46, 0.1);  color: #b91c1c; }
+  &.icon-blue  { background: rgba(14, 165, 233, 0.12); color: #0369a1; }
+  &.icon-green { background: rgba(22, 163, 74, 0.12); color: #15803d; }
+}
+
+.plans-grid {
+  align-items: stretch;
+}
+
+.plan-card {
+  position: relative;
+  background: var(--ps-surface);
+  border: 1px solid var(--ps-border);
+  border-radius: 1.1rem;
+  padding: 1.75rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--ps-shadow-lg);
+  }
+
+  &.featured {
+    border-color: rgba(225, 29, 46, 0.4);
+    box-shadow: 0 16px 40px rgba(225, 29, 46, 0.1);
+  }
+}
+
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  background: linear-gradient(135deg, #e11d2e, #b91c1c);
+  color: #fff;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(225, 29, 46, 0.35);
+
+  i { color: #fde047; }
+}
+
+.plan-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+}
+.plan-desc { color: var(--ps-text-muted); font-size: 0.9rem; margin-bottom: 1.1rem; }
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.4rem 0;
+
+  .amount {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--ps-text);
+    letter-spacing: -0.01em;
+  }
+  .per { color: var(--ps-text-muted); font-size: 0.9rem; }
+}
+
+.plan-monthly {
+  color: var(--ps-text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+
+    i { color: var(--ps-primary); font-size: 1rem; }
+  }
+}

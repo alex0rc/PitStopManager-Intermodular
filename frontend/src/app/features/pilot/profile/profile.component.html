@@ -1,0 +1,186 @@
+<div class="container py-4">
+  <h2 class="fw-bold mb-4">Mi Perfil</h2>
+
+  @if (isOrganizer) {
+    <div class="alert alert-info py-2 mb-4">
+      <i class="bi bi-info-circle me-1"></i>
+      Completa tu perfil de piloto si quieres inscribirte en campeonatos de otros organizadores.
+      <a routerLink="/organizer/inscriptions" class="alert-link ms-1">Ver mis inscripciones</a>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="mt-2 text-muted">Cargando perfil...</p>
+    </div>
+  }
+
+  @if (!loading) {
+    <div class="row g-4">
+      <!-- Avatar -->
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="avatar-wrapper mb-3 mx-auto">
+              @if (avatarPreview) {
+                <img [src]="avatarPreview" alt="Avatar" class="avatar-img" />
+              } @else {
+                <div class="avatar-placeholder">
+                  <i class="bi bi-person-fill fs-1 text-white-50"></i>
+                </div>
+              }
+            </div>
+            <input
+              type="file"
+              id="avatarInput"
+              class="d-none"
+              accept="image/*"
+              (change)="onAvatarSelected($event)"
+            />
+            <label for="avatarInput" class="btn btn-outline-secondary btn-sm mb-2 d-block">
+              <i class="bi bi-camera me-1"></i>Seleccionar imagen
+            </label>
+            @if (avatarFile) {
+              <button
+                class="btn btn-danger btn-sm d-block w-100"
+                (click)="uploadAvatar()"
+                [disabled]="avatarSaving"
+              >
+                @if (avatarSaving) {
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                }
+                Subir avatar
+              </button>
+            }
+            @if (avatarSuccess) {
+              <div class="alert alert-success alert-sm mt-2 mb-0 py-1 px-2 small">{{ avatarSuccess }}</div>
+            }
+            @if (avatarError) {
+              <div class="alert alert-danger alert-sm mt-2 mb-0 py-1 px-2 small">{{ avatarError }}</div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <!-- Datos usuario -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header border-bottom">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-person me-2"></i>Datos de usuario</h5>
+          </div>
+          <div class="card-body p-4">
+            @if (userSuccess) {
+              <div class="alert alert-success py-2">{{ userSuccess }}</div>
+            }
+            @if (userError) {
+              <div class="alert alert-danger py-2">{{ userError }}</div>
+            }
+            <div class="mb-3">
+              <label for="userName" class="form-label">Nombre</label>
+              <input
+                type="text"
+                id="userName"
+                class="form-control"
+                [(ngModel)]="userName"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="userEmail" class="form-label">Email</label>
+              <input
+                type="email"
+                id="userEmail"
+                class="form-control"
+                [(ngModel)]="userEmail"
+                required
+              />
+            </div>
+            <button
+              class="btn btn-danger"
+              (click)="saveUser()"
+              [disabled]="userSaving || !userName || !userEmail"
+            >
+              @if (userSaving) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              }
+              Guardar datos
+            </button>
+          </div>
+        </div>
+
+        <!-- Perfil piloto -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header border-bottom">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-speedometer2 me-2"></i>Perfil de piloto</h5>
+          </div>
+          <div class="card-body p-4">
+            @if (pilotLoading) {
+              <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-danger"></div>
+                <span class="ms-2 text-muted">Cargando perfil de piloto...</span>
+              </div>
+            } @else {
+              @if (pilotSuccess) {
+                <div class="alert alert-success py-2">{{ pilotSuccess }}</div>
+              }
+              @if (pilotError) {
+                <div class="alert alert-danger py-2">{{ pilotError }}</div>
+              }
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="nickname" class="form-label">Nickname</label>
+                  <input
+                    type="text"
+                    id="nickname"
+                    class="form-control"
+                    [(ngModel)]="pilotProfile.nickname"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="birthDate" class="form-label">Fecha de nacimiento</label>
+                  <input
+                    type="date"
+                    id="birthDate"
+                    class="form-control"
+                    [(ngModel)]="pilotProfile.birth_date"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="license" class="form-label">Número de licencia</label>
+                  <input
+                    type="text"
+                    id="license"
+                    class="form-control"
+                    [(ngModel)]="pilotProfile.license_number"
+                  />
+                </div>
+                <div class="col-12">
+                  <label for="bio" class="form-label">Biografía</label>
+                  <textarea
+                    id="bio"
+                    class="form-control"
+                    rows="3"
+                    [(ngModel)]="pilotProfile.bio"
+                  ></textarea>
+                </div>
+              </div>
+              <button
+                class="btn btn-danger mt-3"
+                (click)="savePilotProfile()"
+                [disabled]="pilotSaving"
+              >
+                @if (pilotSaving) {
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                }
+                Guardar perfil
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

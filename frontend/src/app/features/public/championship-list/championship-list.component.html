@@ -1,0 +1,101 @@
+<div class="container py-4">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Campeonatos</h1>
+      <p class="page-subtitle">Encuentra una competición que se adapte a tu nivel y estilo.</p>
+    </div>
+    @if (!loading) {
+      <span class="badge rounded-pill bg-theme-subtle">
+        <i class="bi bi-trophy me-1"></i> {{ filtered.length }} disponibles
+      </span>
+    }
+  </header>
+
+  <div class="search-card mb-4">
+    <i class="bi bi-search search-icon"></i>
+    <input
+      type="text"
+      class="form-control form-control-lg search-input"
+      placeholder="Buscar por nombre, categoría o temporada..."
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+    />
+  </div>
+
+  @if (loading) {
+    <div class="row g-4">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="col-md-6 col-lg-4">
+          <div class="card championship-card h-100">
+            <div class="card-skeleton"><span class="skeleton" style="height:100%;width:100%;display:block"></span></div>
+            <div class="card-body">
+              <span class="skeleton" style="height:22px;width:80%;display:block;margin-bottom:8px"></span>
+              <span class="skeleton" style="height:14px;width:60%;display:block;margin-bottom:6px"></span>
+              <span class="skeleton" style="height:14px;width:40%;display:block"></span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (error && !loading) {
+    <div class="alert alert-danger d-flex align-items-center justify-content-between">
+      <span><i class="bi bi-exclamation-triangle me-2"></i>{{ error }}</span>
+      <button class="btn btn-sm btn-outline-danger" (click)="loadChampionships()">
+        <i class="bi bi-arrow-clockwise"></i> Reintentar
+      </button>
+    </div>
+  }
+
+  @if (!loading && !error) {
+    @if (!filtered.length) {
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="bi bi-search"></i></div>
+          <h5>No se encontraron campeonatos</h5>
+          <p>Prueba a buscar con otro término o vuelve más tarde.</p>
+        </div>
+      </div>
+    } @else {
+      <div class="row g-4">
+        @for (champ of filtered; track champ.id) {
+          <div class="col-md-6 col-lg-4">
+            <div class="card championship-card h-100 d-flex flex-column">
+              <a [routerLink]="['/championships', champ.id]" class="text-decoration-none champ-card-link flex-grow-1">
+                @if (champ.image) {
+                  <img [src]="champ.image" class="card-img-top" [alt]="champ.name" />
+                } @else {
+                  <div class="card-img-top placeholder-img">
+                    <i class="bi bi-flag-fill"></i>
+                  </div>
+                }
+                <span class="status-pill status-{{ champ.status }} card-status">{{ statusLabel(champ.status) }}</span>
+
+                <div class="card-body">
+                  <h5 class="champ-name">{{ champ.name }}</h5>
+                  <div class="champ-meta">
+                    @if (champ.category) {
+                      <span><i class="bi bi-tag"></i> {{ champ.category.name }}</span>
+                    }
+                    <span><i class="bi bi-calendar"></i> {{ champ.season_year }}</span>
+                    @if (champ.races_count !== undefined) {
+                      <span><i class="bi bi-flag"></i> {{ champ.races_count }} carreras</span>
+                    }
+                  </div>
+                </div>
+              </a>
+
+              <div class="card-actions px-3 pb-3 pt-0 d-flex flex-column gap-2">
+                <app-championship-inscribe [championship]="champ" layout="card" />
+                <a [routerLink]="['/championships', champ.id]" class="btn btn-outline-secondary btn-sm w-100">
+                  <i class="bi bi-eye me-1"></i>Ver detalles
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

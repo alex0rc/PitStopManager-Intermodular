@@ -1,0 +1,254 @@
+@if (!isAuthRoute) {
+<header class="ps-header">
+  <nav class="navbar navbar-expand-lg ps-navbar">
+    <div class="container-fluid ps-nav-container">
+      <a class="navbar-brand" routerLink="/" (click)="closeMenus()">
+        <app-brand-logo size="md" alt="" />
+        <span class="brand-text">
+          Pit<span class="brand-accent">Stop</span>
+          <small>Manager</small>
+        </span>
+      </a>
+
+      <div class="ps-nav-end">
+        <div class="nav-actions-compact">
+          @if (currentUser$ | async; as user) {
+            <div class="user-menu">
+              <button
+                type="button"
+                class="btn user-btn"
+                (click)="toggleUserMenu($event)"
+                [class.open]="userMenuOpen"
+                [attr.aria-expanded]="userMenuOpen"
+                aria-label="Menú de cuenta"
+              >
+                <ng-container *ngTemplateOutlet="userAvatar; context: { $implicit: user, size: 'sm' }"></ng-container>
+                <span class="user-btn-text d-none d-md-inline">{{ user.name }}</span>
+                <i class="bi bi-chevron-down user-chevron d-none d-lg-inline"></i>
+              </button>
+              @if (userMenuOpen) {
+                <div class="user-dropdown d-none d-lg-block">
+                  <ng-container *ngTemplateOutlet="userMenuLinks; context: { $implicit: user }"></ng-container>
+                </div>
+              }
+            </div>
+          } @else {
+            <button
+              type="button"
+              class="btn btn-ghost btn-icon-only d-none d-md-inline-flex"
+              (click)="toggleTheme()"
+              [attr.aria-label]="theme.isDark ? 'Modo claro' : 'Modo oscuro'"
+            >
+              <i class="bi" [class.bi-moon-stars-fill]="!theme.isDark" [class.bi-sun-fill]="theme.isDark"></i>
+            </button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="navbar-toggler d-lg-none"
+          (click)="toggleNavbar()"
+          [attr.aria-expanded]="!navbarCollapsed"
+          aria-label="Abrir menú de navegación"
+        >
+          <i class="bi" [class.bi-list]="navbarCollapsed" [class.bi-x-lg]="!navbarCollapsed"></i>
+        </button>
+      </div>
+
+      <div class="collapse navbar-collapse" [class.show]="!navbarCollapsed" id="psNavCollapse">
+        <div class="navbar-nav-shell">
+          <div class="nav-section">
+            <span class="nav-section-label">Explorar</span>
+            <ul class="navbar-nav nav-main">
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenus()">
+                  <i class="bi bi-house-door"></i><span>Inicio</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/championships" routerLinkActive="active" (click)="closeMenus()">
+                  <i class="bi bi-trophy"></i><span>Campeonatos</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="/circuits" routerLinkActive="active" (click)="closeMenus()">
+                  <i class="bi bi-pin-map"></i><span>Circuitos</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          @if (currentUser$ | async; as user) {
+            <div class="nav-section">
+              <span class="nav-section-label">{{ roleLabel(user.role) }}</span>
+              <ul class="navbar-nav nav-role">
+                @if (user.role === 'organizer') {
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/organizer/championships" routerLinkActive="active" (click)="closeMenus()">
+                      <i class="bi bi-list-stars"></i><span>Mis Campeonatos</span>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/organizer/circuits" routerLinkActive="active" (click)="closeMenus()">
+                      <i class="bi bi-geo-alt"></i><span>Mis Circuitos</span>
+                    </a>
+                  </li>
+                }
+                @if (user.role === 'pilot') {
+                  <li class="nav-item">
+                    <a class="nav-link" routerLink="/pilot" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenus()">
+                      <i class="bi bi-speedometer"></i><span>Mi Panel</span>
+                    </a>
+                  </li>
+                }
+                @if (user.role === 'admin') {
+                  <li class="nav-item">
+                    <a class="nav-link" [href]="adminUrl" target="_blank" rel="noopener" (click)="closeMenus()">
+                      <i class="bi bi-speedometer2"></i><span>Panel Admin</span>
+                    </a>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (!(currentUser$ | async)) {
+            <div class="nav-section nav-auth d-lg-none">
+              <button type="button" class="dropdown-item w-100 mb-2" (click)="toggleTheme()">
+                <i class="bi" [class.bi-moon-stars-fill]="!theme.isDark" [class.bi-sun-fill]="theme.isDark"></i>
+                {{ theme.isDark ? 'Modo claro' : 'Modo oscuro' }}
+              </button>
+              <a class="btn btn-ghost w-100 mb-2" routerLink="/login" (click)="closeMenus()">Iniciar sesión</a>
+              <a class="btn btn-primary w-100" routerLink="/register" (click)="closeMenus()">
+                <i class="bi bi-rocket-takeoff me-1"></i> Registrarse
+              </a>
+            </div>
+          }
+        </div>
+
+        @if (!(currentUser$ | async)) {
+          <ul class="navbar-nav nav-auth-desktop ms-lg-auto d-none d-lg-flex align-items-center gap-2">
+            <li class="nav-item">
+              <button type="button" class="btn btn-ghost btn-icon-only" (click)="toggleTheme()" [attr.aria-label]="theme.isDark ? 'Modo claro' : 'Modo oscuro'">
+                <i class="bi" [class.bi-moon-stars-fill]="!theme.isDark" [class.bi-sun-fill]="theme.isDark"></i>
+              </button>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-ghost" routerLink="/login">Iniciar sesión</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-primary btn-icon" routerLink="/register">
+                <i class="bi bi-rocket-takeoff"></i> Registrarse
+              </a>
+            </li>
+          </ul>
+        }
+      </div>
+    </div>
+  </nav>
+</header>
+
+@if (currentUser$ | async; as user) {
+  @if (userMenuOpen) {
+    <div class="user-sheet d-lg-none" role="dialog" aria-label="Menú de cuenta">
+      <div class="user-sheet-header">
+        <div class="d-flex align-items-center gap-2">
+          <ng-container *ngTemplateOutlet="userAvatar; context: { $implicit: user, size: 'lg' }"></ng-container>
+          <div>
+            <strong>{{ user.name }}</strong>
+            <span class="small text-muted-2 d-block">{{ roleLabel(user.role) }}</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-ghost btn-icon-only user-sheet-close" (click)="closeMenus()" aria-label="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="user-sheet-body">
+        <ng-container *ngTemplateOutlet="userMenuLinks; context: { $implicit: user }"></ng-container>
+      </div>
+    </div>
+  }
+}
+}
+
+<ng-template #userAvatar let-user let-size="size">
+  @if (user.avatar) {
+    <img
+      [src]="user.avatar"
+      alt=""
+      class="avatar"
+      [class.avatar-sm]="size === 'sm'"
+      [class.avatar-lg]="size === 'lg'"
+      [class.avatar-photo]="true"
+    />
+  } @else {
+    <span class="avatar" [class.avatar-sm]="size === 'sm'" [class.avatar-lg]="size === 'lg'" [class]="'avatar-' + user.role">
+      {{ initials(user.name) }}
+    </span>
+  }
+</ng-template>
+
+<ng-template #userMenuLinks let-user>
+  <a class="dropdown-item" routerLink="/profile" (click)="closeMenus()">
+    <i class="bi bi-person-circle"></i> Mi Perfil
+  </a>
+  @if (user.role === 'pilot') {
+    <a class="dropdown-item" routerLink="/pilot/inscriptions" (click)="closeMenus()">
+      <i class="bi bi-ticket-perforated"></i> Mis Inscripciones
+    </a>
+    <a class="dropdown-item" routerLink="/pilot/results" (click)="closeMenus()">
+      <i class="bi bi-graph-up"></i> Mis Resultados
+    </a>
+    <a class="dropdown-item" routerLink="/pilot/payments" (click)="closeMenus()">
+      <i class="bi bi-receipt"></i> Mis Pagos
+    </a>
+    <a class="dropdown-item upgrade-item" routerLink="/pilot/upgrade" (click)="closeMenus()">
+      <i class="bi bi-lightning-charge-fill"></i> Ser organizador
+    </a>
+  }
+  @if (user.role === 'organizer') {
+    <a class="dropdown-item" routerLink="/organizer/inscriptions" (click)="closeMenus()">
+      <i class="bi bi-ticket-perforated"></i> Mis Inscripciones
+    </a>
+    <a class="dropdown-item" routerLink="/organizer/subscription" (click)="closeMenus()">
+      <i class="bi bi-credit-card"></i> Mi Suscripción
+    </a>
+  }
+  @if (user.role === 'admin') {
+    <a class="dropdown-item" [href]="adminUrl" target="_blank" rel="noopener" (click)="closeMenus()">
+      <i class="bi bi-speedometer2"></i> Panel Admin
+    </a>
+  }
+  <button type="button" class="dropdown-item" (click)="toggleTheme()">
+    <i class="bi" [class.bi-moon-stars-fill]="!theme.isDark" [class.bi-sun-fill]="theme.isDark"></i>
+    {{ theme.isDark ? 'Modo claro' : 'Modo oscuro' }}
+  </button>
+  <hr class="dropdown-divider" />
+  <button type="button" class="dropdown-item text-danger" (click)="logout()">
+    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+  </button>
+</ng-template>
+
+@if (!isAuthRoute && (!navbarCollapsed || userMenuOpen)) {
+  <div
+    class="nav-backdrop d-lg-none"
+    (click)="closeMenus()"
+    aria-hidden="true"
+  ></div>
+}
+
+<main class="main-content" [class.main-content--auth]="isAuthRoute">
+  <router-outlet />
+</main>
+
+@if (!isAuthRoute) {
+<footer class="ps-footer">
+  <div class="container-fluid ps-nav-container d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <app-brand-logo size="sm" alt="" />
+      <span class="fw-semibold">PitStop Manager</span>
+    </div>
+    <span class="text-muted-2 small text-center text-sm-end">© {{ year }} · Karting amateur</span>
+  </div>
+</footer>
+}

@@ -1,0 +1,59 @@
+<div class="result-shell">
+  <div class="result-card fade-in-up" [class.success]="mode === 'success'" [class.cancel]="mode === 'cancel'">
+    <div class="result-icon">
+      @if (mode === 'success') {
+        <i class="bi bi-check-circle-fill"></i>
+      } @else {
+        <i class="bi bi-x-circle-fill"></i>
+      }
+    </div>
+
+    @if (mode === 'success') {
+      @if (wasOrganizer) {
+        <h2>¡Suscripción renovada!</h2>
+        <p class="lead">Tu plan sigue activo. Puedes seguir gestionando campeonatos y carreras.</p>
+      } @else {
+        <h2>¡Bienvenido a la parrilla, organizador!</h2>
+        <p class="lead">Tu suscripción está activa. Ya puedes crear campeonatos, circuitos y carreras.</p>
+      }
+
+      @if (refreshing) {
+        <p class="text-muted-2"><span class="spinner-border spinner-border-sm me-2"></span> Actualizando tu cuenta...</p>
+      } @else if (user?.role === 'organizer') {
+        <p class="text-muted-2">Te redirigimos a tu suscripción en un instante...</p>
+      } @else {
+        <p class="text-muted-2">
+          Estamos procesando el pago. Si tu rol no se actualiza en unos minutos,
+          actualiza la página o contacta con soporte.
+        </p>
+      }
+
+      <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+        @if (user?.role === 'organizer') {
+          <a routerLink="/organizer/subscription" class="btn btn-primary btn-icon">
+            <i class="bi bi-credit-card-2-back"></i> Ver mi suscripción
+          </a>
+          <a routerLink="/organizer/championships" class="btn btn-outline-primary btn-icon">
+            <i class="bi bi-trophy"></i> Mis campeonatos
+          </a>
+        } @else {
+          <a routerLink="/pilot" class="btn btn-outline-primary btn-icon">
+            <i class="bi bi-speedometer"></i> Volver al dashboard
+          </a>
+        }
+      </div>
+    } @else {
+      <h2>Pago cancelado</h2>
+      <p class="lead">No se ha realizado ningún cargo. Puedes intentarlo de nuevo cuando quieras.</p>
+
+      <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+        <a routerLink="/pilot/upgrade" class="btn btn-primary btn-icon">
+          <i class="bi bi-arrow-counterclockwise"></i> Volver a los planes
+        </a>
+        <button type="button" class="btn btn-outline-secondary btn-icon" (click)="goToDashboard()">
+          <i class="bi bi-house"></i> Ir al dashboard
+        </button>
+      </div>
+    }
+  </div>
+</div>

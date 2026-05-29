@@ -1,0 +1,144 @@
+<div class="container py-4">
+  <h2>{{ isEdit ? 'Editar Circuito' : 'Nuevo Circuito' }}</h2>
+
+  @if (error) {
+    <div class="alert alert-danger alert-dismissible fade show mt-3">
+      {{ error }}
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+    </div>
+  }
+
+  @if (loadingData) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="name" class="form-label">Nombre *</label>
+          <input id="name" type="text" class="form-control" formControlName="name"
+                 [class.is-invalid]="isInvalid('name')">
+          @if (isInvalid('name')) {
+            <div class="invalid-feedback">El nombre es obligatorio.</div>
+          }
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Imagen del circuito</label>
+          <div class="d-flex flex-wrap align-items-center gap-3">
+            @if (imagePreview) {
+              <img [src]="imagePreview" alt="Vista previa" class="rounded border circuit-preview-img" />
+            }
+            <input type="file" id="circuitImage" class="form-control" style="max-width:280px" accept="image/*" (change)="onImageSelected($event)" />
+          </div>
+          <div class="form-text">Opcional. Se verá en el catálogo y en la ficha del circuito.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="location" class="form-label">Ubicación / dirección *</label>
+          <input id="location" type="text" class="form-control" formControlName="location"
+                 placeholder="Ej. Polígono industrial, km 3"
+                 [class.is-invalid]="isInvalid('location')">
+          @if (isInvalid('location')) {
+            <div class="invalid-feedback">La ubicación es obligatoria.</div>
+          }
+        </div>
+
+        <div class="col-md-4">
+          <label for="country" class="form-label">País</label>
+          <select id="country" class="form-select" formControlName="country" (change)="onCountryChange()">
+            <option value="">— Seleccionar —</option>
+            @for (c of countries; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="province" class="form-label">Provincia</label>
+          <select id="province" class="form-select" formControlName="province" (change)="onProvinceChange()" [disabled]="!provinces.length">
+            <option value="">— Seleccionar —</option>
+            @for (p of provinces; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="city" class="form-label">Ciudad / localidad</label>
+          <select id="city" class="form-select" formControlName="city" [disabled]="!provinces.length">
+            <option value="">— Seleccionar —</option>
+            @for (cityOpt of cities; track cityOpt) {
+              <option [value]="cityOpt">{{ cityOpt }}</option>
+            }
+            <option [value]="otherCityValue">— Otra (escribir) —</option>
+          </select>
+        </div>
+
+        @if (showCustomCity) {
+          <div class="col-md-6">
+            <label for="customCity" class="form-label">Nombre de ciudad</label>
+            <input id="customCity" type="text" class="form-control" [(ngModel)]="customCity"
+                   [ngModelOptions]="{ standalone: true }"
+                   placeholder="Ej. Zuera, Olvera, Portimão..." />
+          </div>
+        }
+
+        <div class="col-md-4">
+          <label for="length_meters" class="form-label">Longitud (metros)</label>
+          <input id="length_meters" type="number" class="form-control" formControlName="length_meters"
+                 [class.is-invalid]="isInvalid('length_meters')">
+        </div>
+
+        <div class="col-12">
+          <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+            <h5 class="h6 fw-bold mb-0">Coordenadas (OpenWeather)</h5>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="fetchCoordinates()" [disabled]="geocoding">
+              @if (geocoding) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              }
+              <i class="bi bi-search me-1"></i>Centrar por ciudad
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <label for="latitude" class="form-label">Latitud</label>
+          <input id="latitude" type="number" step="any" class="form-control" formControlName="latitude">
+        </div>
+
+        <div class="col-md-3">
+          <label for="longitude" class="form-label">Longitud</label>
+          <input id="longitude" type="number" step="any" class="form-control" formControlName="longitude">
+        </div>
+
+        <div class="col-12">
+          <app-map-picker
+            [latitude]="form.get('latitude')?.value"
+            [longitude]="form.get('longitude')?.value"
+            [center]="mapCenter"
+            (coordinatesChange)="onMapCoordinates($event)"
+          />
+        </div>
+
+        <div class="col-12">
+          <label for="description" class="form-label">Descripción</label>
+          <textarea id="description" class="form-control" formControlName="description" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ isEdit ? 'Actualizar' : 'Crear' }}
+        </button>
+        <a routerLink="/organizer/circuits" class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  }
+</div>

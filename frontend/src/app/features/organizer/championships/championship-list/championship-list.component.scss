@@ -1,0 +1,19 @@
+.status-select {
+  width: auto;
+  min-width: 7.5rem;
+  display: inline-block;
+}
+
+@media (max-width: 991.98px) {
+  .champ-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    justify-content: flex-start;
+
+    .btn,
+    .status-select {
+      flex: 0 0 auto;
+    }
+  }
+}

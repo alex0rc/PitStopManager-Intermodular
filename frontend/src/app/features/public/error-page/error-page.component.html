@@ -1,0 +1,22 @@
+<div class="error-page">
+  <div class="error-card">
+    <div class="error-code">{{ config.code }}</div>
+    <i class="bi error-icon {{ config.icon }}"></i>
+    <h1>{{ config.title }}</h1>
+    <p class="error-message">{{ config.message }}</p>
+
+    <div class="error-actions">
+      <a [routerLink]="homeLink" class="btn btn-primary btn-icon">
+        <i class="bi bi-house-door"></i> Ir al inicio
+      </a>
+      <a routerLink="/championships" class="btn btn-outline-secondary btn-icon">
+        <i class="bi bi-trophy"></i> Campeonatos
+      </a>
+      @if (config.code === 401 || config.code === 403) {
+        <a routerLink="/login" class="btn btn-outline-primary btn-icon">
+          <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+        </a>
+      }
+    </div>
+  </div>
+</div>

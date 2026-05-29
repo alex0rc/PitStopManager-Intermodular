@@ -1,0 +1,15 @@
+@if (lastPage() > 1) {
+  <nav class="d-flex justify-content-between align-items-center mt-3">
+    <small class="text-muted">
+      Página {{ currentPage() }} de {{ lastPage() }} ({{ total() }} elementos)
+    </small>
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item" [class.disabled]="currentPage() === 1">
+        <button class="page-link" (click)="goToPage(currentPage() - 1)">&laquo; Anterior</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage() === lastPage()">
+        <button class="page-link" (click)="goToPage(currentPage() + 1)">Siguiente &raquo;</button>
+      </li>
+    </ul>
+  </nav>
+}

@@ -1,0 +1,125 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mis Campeonatos</h2>
+    @if (canCreateChampionship) {
+      <a routerLink="/organizer/championships/new" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Nuevo Campeonato
+      </a>
+    } @else {
+      <a routerLink="/organizer/subscription" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-up-circle me-1"></i> Mejorar plan
+      </a>
+    }
+  </div>
+
+  @if (quota; as q) {
+    @if (q.has_active_subscription) {
+      <div class="alert alert-light border mb-3">
+        <strong>{{ q.plan_name }}</strong>:
+        {{ q.current_championships }} / {{ q.max_championships }} campeonatos activos
+        · {{ q.days_remaining }} días restantes
+        @if (q.deny_reason) {
+          <span class="d-block mt-1 text-warning">{{ q.deny_reason }}</span>
+        }
+      </div>
+    }
+  }
+
+  @if (error) {
+    <div class="alert alert-danger alert-dismissible fade show">
+      {{ error }}
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (championships.length === 0) {
+    <div class="alert alert-info">
+      No tienes campeonatos creados aún. ¡Crea tu primer campeonato!
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Temporada</th>
+            <th>Estado</th>
+            <th>Carreras</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (champ of championships; track champ.id) {
+            <tr>
+              <td>{{ champ.name }}</td>
+              <td>{{ champ.category?.name || '-' }}</td>
+              <td>{{ champ.season_year }}</td>
+              <td>
+                <span class="badge" [class]="getStatusBadgeClass(champ.status)">
+                  {{ statusLabel(champ.status) }}
+                </span>
+              </td>
+              <td>{{ champ.races_count ?? 0 }}</td>
+              <td>
+                <div class="btn-group btn-group-sm champ-actions">
+                  <a [routerLink]="['/organizer/championships', champ.id, 'races']"
+                     class="btn btn-outline-info" title="Ver Carreras">
+                    <i class="bi bi-flag"></i>
+                  </a>
+                  <a [routerLink]="['/organizer/championships', champ.id, 'inscriptions']"
+                     class="btn btn-outline-success" title="Inscripciones">
+                    <i class="bi bi-people"></i>
+                  </a>
+                  @if (isOwner(champ)) {
+                    <a [routerLink]="['/organizer/championships', champ.id, 'edit']"
+                       class="btn btn-outline-warning" title="Editar">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <select class="form-select form-select-sm status-select"
+                            [value]="champ.status"
+                            (change)="changeStatus(champ, $any($event.target).value)"
+                            title="Cambiar estado">
+                      <option value="draft">Borrador</option>
+                      <option value="published">Publicado</option>
+                      <option value="in_progress">En curso</option>
+                      <option value="finished">Finalizado</option>
+                      <option value="cancelled">Cancelado</option>
+                    </select>
+                    <button class="btn btn-outline-danger" (click)="deleteChampionship(champ.id)" title="Eliminar">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (lastPage > 1) {
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link" (click)="goToPage(currentPage - 1)">Anterior</button>
+          </li>
+          @for (p of pages; track p) {
+            <li class="page-item" [class.active]="p === currentPage">
+              <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+            </li>
+          }
+          <li class="page-item" [class.disabled]="currentPage === lastPage">
+            <button class="page-link" (click)="goToPage(currentPage + 1)">Siguiente</button>
+          </li>
+        </ul>
+      </nav>
+    }
+  }
+</div>

@@ -1,0 +1,165 @@
+<div class="auth-shell">
+  <aside class="auth-aside">
+    <div class="auth-aside-inner">
+      <a routerLink="/" class="auth-brand">
+        <app-brand-logo size="lg" />
+        <span>
+          Pit<span class="brand-accent">Stop</span>
+          <small>Manager</small>
+        </span>
+      </a>
+
+      <div class="auth-aside-content">
+        <span class="aside-eyebrow"><i class="bi bi-rocket-takeoff"></i> Únete a la parrilla</span>
+        <h2>Tu primera vuelta empieza aquí.</h2>
+        <p>Crea tu cuenta de Piloto gratis. Si quieres organizar campeonatos, podrás activar una suscripción después.</p>
+
+        <div class="aside-roles">
+          <div class="role-chip">
+            <i class="bi bi-helmet"></i>
+            <div>
+              <strong>Piloto</strong>
+              <small>Inscribite, compite, mejora tus tiempos.</small>
+            </div>
+          </div>
+          <div class="role-chip">
+            <i class="bi bi-trophy-fill"></i>
+            <div>
+              <strong>Organizador</strong>
+              <small>Lanza campeonatos y gestiona inscripciones.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-aside-footer">
+        <small>© {{ year }} PitStop Manager</small>
+      </div>
+    </div>
+  </aside>
+
+  <section class="auth-form-wrap">
+    <div class="auth-form-card fade-in-up">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold mb-1">Crear cuenta</h3>
+        <p class="text-muted-2 mb-0">Tardarás menos que una vuelta rápida</p>
+      </div>
+
+      @if (error) {
+        <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+          <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+          <div class="flex-grow-1">{{ error }}</div>
+          <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre completo</label>
+          <div class="input-group-icon">
+            <span class="input-icon"><i class="bi bi-person"></i></span>
+            <input
+              type="text"
+              id="name"
+              class="form-control"
+              formControlName="name"
+              placeholder="Tu nombre completo"
+              autocomplete="name"
+              [class.is-invalid]="form.get('name')!.touched && form.get('name')!.invalid"
+            />
+          </div>
+          @if (form.get('name')!.touched && form.get('name')!.hasError('required')) {
+            <div class="form-text text-danger">El nombre es obligatorio.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-group-icon">
+            <span class="input-icon"><i class="bi bi-envelope"></i></span>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              formControlName="email"
+              placeholder="tu@email.com"
+              autocomplete="email"
+              [class.is-invalid]="form.get('email')!.touched && form.get('email')!.invalid"
+            />
+          </div>
+          @if (form.get('email')!.touched && form.get('email')!.hasError('required')) {
+            <div class="form-text text-danger">El email es obligatorio.</div>
+          }
+          @if (form.get('email')!.touched && form.get('email')!.hasError('email')) {
+            <div class="form-text text-danger">Introduce un email válido.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-group-icon">
+            <span class="input-icon"><i class="bi bi-lock"></i></span>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              class="form-control"
+              formControlName="password"
+              placeholder="Mínimo 8 caracteres"
+              autocomplete="new-password"
+              [class.is-invalid]="form.get('password')!.touched && form.get('password')!.invalid"
+            />
+            <button type="button" class="input-eye" (click)="showPassword = !showPassword" tabindex="-1" aria-label="Mostrar contraseña">
+              <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          @if (form.get('password')!.touched && form.get('password')!.hasError('required')) {
+            <div class="form-text text-danger">La contraseña es obligatoria.</div>
+          }
+          @if (form.get('password')!.touched && form.get('password')!.hasError('minlength')) {
+            <div class="form-text text-danger">Mínimo 8 caracteres.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
+          <div class="input-group-icon">
+            <span class="input-icon"><i class="bi bi-shield-check"></i></span>
+            <input
+              [type]="showConfirm ? 'text' : 'password'"
+              id="password_confirmation"
+              class="form-control"
+              formControlName="password_confirmation"
+              placeholder="Repite tu contraseña"
+              autocomplete="new-password"
+              [class.is-invalid]="form.get('password_confirmation')!.touched && form.get('password_confirmation')!.invalid"
+            />
+            <button type="button" class="input-eye" (click)="showConfirm = !showConfirm" tabindex="-1" aria-label="Mostrar confirmación">
+              <i class="bi" [class.bi-eye]="!showConfirm" [class.bi-eye-slash]="showConfirm"></i>
+            </button>
+          </div>
+          @if (form.get('password_confirmation')!.touched && form.get('password_confirmation')!.hasError('required')) {
+            <div class="form-text text-danger">Confirma tu contraseña.</div>
+          }
+          @if (form.get('password_confirmation')!.touched && form.get('password_confirmation')!.hasError('passwordMismatch')) {
+            <div class="form-text text-danger">Las contraseñas no coinciden.</div>
+          }
+        </div>
+
+        <div class="info-banner mb-3">
+          <i class="bi bi-info-circle"></i>
+          <span>Tu cuenta se creará como <strong>Piloto</strong>. Para acceso de Organizador, contrata una suscripción desde tu dashboard.</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 btn-icon justify-content-center" [disabled]="form.invalid || loading">
+          @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
+          @else { <i class="bi bi-rocket-takeoff"></i> }
+          {{ loading ? 'Creando...' : 'Crear mi cuenta' }}
+        </button>
+      </form>
+
+      <p class="text-center mt-4 mb-0 text-muted-2">
+        ¿Ya tienes cuenta? <a routerLink="/login" class="fw-semibold">Inicia sesión</a>
+      </p>
+    </div>
+  </section>
+</div>

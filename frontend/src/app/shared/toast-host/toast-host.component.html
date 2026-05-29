@@ -1,0 +1,14 @@
+<div class="toast-host" aria-live="polite" aria-atomic="true">
+  @for (t of toasts(); track t.id) {
+    <div class="toast-item" [ngClass]="'toast-' + t.variant" role="status">
+      <i class="bi" [ngClass]="iconFor(t)"></i>
+      <div class="toast-body">
+        @if (t.title) { <strong class="toast-title">{{ t.title }}</strong> }
+        <span class="toast-message">{{ t.message }}</span>
+      </div>
+      <button type="button" class="toast-close" (click)="dismiss(t.id)" aria-label="Cerrar">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  }
+</div>

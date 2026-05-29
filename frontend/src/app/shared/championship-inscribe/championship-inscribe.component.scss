@@ -1,0 +1,42 @@
+.inscribe-wrap.inscribe-hero {
+  margin-top: 0.75rem;
+}
+
+.inscribe-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+
+  &.insc-confirmed {
+    border-color: rgba(25, 135, 84, 0.6);
+    background: rgba(25, 135, 84, 0.2);
+  }
+
+  &.insc-pending {
+    border-color: rgba(255, 193, 7, 0.6);
+    background: rgba(255, 193, 7, 0.15);
+  }
+}
+
+.inscribe-hint {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.inscribe-modal {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.inscribe-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}

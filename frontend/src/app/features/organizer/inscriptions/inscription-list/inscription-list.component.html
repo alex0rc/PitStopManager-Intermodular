@@ -1,0 +1,171 @@
+<div class="container-fluid py-4 inscription-page">
+  <header class="page-header">
+    <div>
+      <a [routerLink]="['/organizer/championships', championshipId, 'races']"
+         class="btn btn-sm btn-outline-secondary mb-2">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+      <h2 class="page-title mb-0">Inscripciones</h2>
+    </div>
+  </header>
+
+  @if (successMsg) {
+    <div class="alert alert-success alert-dismissible fade show">
+      {{ successMsg }}
+      <button type="button" class="btn-close" (click)="successMsg = ''"></button>
+    </div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger alert-dismissible fade show">
+      {{ error }}
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (inscriptions.length === 0) {
+    <div class="alert alert-info">No hay inscripciones para este campeonato.</div>
+  } @else {
+    <!-- Escritorio: tabla -->
+    <div class="table-wrap d-none d-lg-block">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Piloto</th>
+              <th>Kart</th>
+              <th>Carreras</th>
+              <th>Nº</th>
+              <th>Estado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (insc of inscriptions; track insc.id) {
+              <tr>
+                <td>
+                  <div class="fw-semibold">{{ insc.user?.name || '-' }}</div>
+                  <small class="text-muted">{{ insc.user?.email }}</small>
+                </td>
+                <td class="small">{{ insc.kart_info || '—' }}</td>
+                <td class="small">
+                  @if (insc.races?.length) {
+                    <div class="race-tags">
+                      @for (race of insc.races; track race.id) {
+                        <span class="race-tag">
+                          {{ race.name }}
+                          @if (canManage(insc)) {
+                            <button type="button" class="race-tag-remove"
+                                    (click)="removeFromRace(insc, race.id, race.name)"
+                                    title="Quitar de esta carrera">
+                              <i class="bi bi-x"></i>
+                            </button>
+                          }
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="text-muted">Sin carreras</span>
+                  }
+                </td>
+                <td>{{ insc.car_number ?? '—' }}</td>
+                <td>
+                  <span class="badge" [class]="getStatusBadgeClass(insc.status)">
+                    {{ getStatusLabel(insc.status) }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="action-stack justify-content-end">
+                    @if (insc.status === 'pending') {
+                      <button class="btn btn-sm btn-outline-success" (click)="approve(insc)">
+                        <i class="bi bi-check-lg"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="reject(insc)">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    }
+                    @if (canManage(insc)) {
+                      <button class="btn btn-sm btn-outline-danger" (click)="removeFromChampionship(insc)"
+                              title="Quitar del campeonato">
+                        <i class="bi bi-person-x"></i>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Móvil: tarjetas -->
+    <div class="inscription-cards d-lg-none">
+      @for (insc of inscriptions; track insc.id) {
+        <article class="inscription-card card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+              <div>
+                <h3 class="h6 mb-0">{{ insc.user?.name || 'Piloto' }}</h3>
+                <small class="text-muted">{{ insc.user?.email }}</small>
+              </div>
+              <span class="badge" [class]="getStatusBadgeClass(insc.status)">
+                {{ getStatusLabel(insc.status) }}
+              </span>
+            </div>
+
+            @if (insc.kart_info) {
+              <p class="small mb-2"><i class="bi bi-wrench me-1"></i>{{ insc.kart_info }}</p>
+            }
+            @if (insc.car_number) {
+              <p class="small mb-2">Nº dorsal: <strong>{{ insc.car_number }}</strong></p>
+            }
+
+            <div class="mb-3">
+              <span class="small text-muted d-block mb-1">Carreras</span>
+              @if (insc.races?.length) {
+                <div class="race-tags">
+                  @for (race of insc.races; track race.id) {
+                    <span class="race-tag">
+                      {{ race.name }}
+                      @if (canManage(insc)) {
+                        <button type="button" class="race-tag-remove"
+                                (click)="removeFromRace(insc, race.id, race.name)">
+                          <i class="bi bi-x"></i>
+                        </button>
+                      }
+                    </span>
+                  }
+                </div>
+              } @else {
+                <span class="text-muted small">Sin carreras asignadas</span>
+              }
+            </div>
+
+            <div class="action-stack">
+              @if (insc.status === 'pending') {
+                <button class="btn btn-sm btn-success flex-fill" (click)="approve(insc)">
+                  <i class="bi bi-check-lg me-1"></i>Aprobar
+                </button>
+                <button class="btn btn-sm btn-outline-danger flex-fill" (click)="reject(insc)">
+                  <i class="bi bi-x-lg me-1"></i>Rechazar
+                </button>
+              }
+              @if (canManage(insc)) {
+                <button class="btn btn-sm btn-outline-danger w-100" (click)="removeFromChampionship(insc)">
+                  <i class="bi bi-person-x me-1"></i>Quitar del campeonato
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>

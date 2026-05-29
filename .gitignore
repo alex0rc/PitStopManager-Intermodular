@@ -1,0 +1,28 @@
+# Dependencies
+/backend/vendor/
+/frontend/node_modules/
+/frontend/dist/
+
+# Environment
+/backend/.env
+/backend/.env.docker
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+/backend/storage/logs/*.log
+
+# Docker volumes
+dbdata/
+
+# Referencia local / IDE
+/reference/
+/.cursor/

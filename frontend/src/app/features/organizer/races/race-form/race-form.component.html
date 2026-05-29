@@ -1,0 +1,86 @@
+<div class="container py-4">
+  <h2>{{ isEdit ? 'Editar Carrera' : 'Nueva Carrera' }}</h2>
+
+  @if (error) {
+    <div class="alert alert-danger alert-dismissible fade show mt-3">
+      {{ error }}
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+    </div>
+  }
+
+  @if (loadingData) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-3">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="name" class="form-label">Nombre *</label>
+          <input id="name" type="text" class="form-control" formControlName="name"
+                 [class.is-invalid]="isInvalid('name')">
+          @if (isInvalid('name')) {
+            <div class="invalid-feedback">El nombre es obligatorio.</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Provincia (filtro)</label>
+          <select class="form-select mb-2" [(ngModel)]="filterProvince" [ngModelOptions]="{standalone: true}" (change)="loadCircuits()">
+            <option value="">Todas</option>
+            @for (p of provinces; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+          <label for="circuit_id" class="form-label">Circuito aprobado *</label>
+          <select id="circuit_id" class="form-select" formControlName="circuit_id"
+                  [class.is-invalid]="isInvalid('circuit_id')">
+            <option [ngValue]="null" disabled>Seleccionar circuito</option>
+            @for (circuit of circuits; track circuit.id) {
+              <option [ngValue]="circuit.id">{{ circuit.name }} — {{ circuit.province || circuit.city }}</option>
+            }
+          </select>
+          @if (isInvalid('circuit_id')) {
+            <div class="invalid-feedback">El circuito es obligatorio.</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="scheduled_at" class="form-label">Fecha y hora programada *</label>
+          <input id="scheduled_at" type="datetime-local" class="form-control" formControlName="scheduled_at"
+                 [class.is-invalid]="isInvalid('scheduled_at')">
+          @if (isInvalid('scheduled_at')) {
+            <div class="invalid-feedback">La fecha es obligatoria.</div>
+          }
+        </div>
+
+        <div class="col-md-6">
+          <label for="total_laps" class="form-label">Total de vueltas</label>
+          <input id="total_laps" type="number" class="form-control" formControlName="total_laps"
+                 [class.is-invalid]="isInvalid('total_laps')">
+          @if (isInvalid('total_laps')) {
+            <div class="invalid-feedback">El número de vueltas debe ser al menos 1.</div>
+          }
+        </div>
+
+        <div class="col-12">
+          <label for="notes" class="form-label">Notas</label>
+          <textarea id="notes" class="form-control" formControlName="notes" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ isEdit ? 'Actualizar' : 'Crear' }}
+        </button>
+        <a [routerLink]="['/organizer/championships', championshipId, 'races']"
+           class="btn btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  }
+</div>

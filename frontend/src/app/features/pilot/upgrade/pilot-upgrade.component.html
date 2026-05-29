@@ -1,0 +1,101 @@
+<div class="container py-4">
+  <header class="page-header mb-4">
+    <div>
+      <a routerLink="/pilot" class="back-link mb-2 d-inline-flex align-items-center gap-1">
+        <i class="bi bi-arrow-left"></i> Volver al dashboard
+      </a>
+      <h1 class="page-title">Conviértete en organizador</h1>
+      <p class="page-subtitle">Activa una suscripción para crear campeonatos, circuitos y carreras.</p>
+    </div>
+  </header>
+
+  <div class="benefits-card mb-4">
+    <div class="row g-3">
+      <div class="col-md-4 d-flex align-items-center gap-3">
+        <span class="benefit-icon icon-red"><i class="bi bi-trophy"></i></span>
+        <div>
+          <strong>Crea campeonatos</strong>
+          <p class="text-muted-2 mb-0 small">Define categorías, circuitos y carreras.</p>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex align-items-center gap-3">
+        <span class="benefit-icon icon-blue"><i class="bi bi-people"></i></span>
+        <div>
+          <strong>Gestiona pilotos</strong>
+          <p class="text-muted-2 mb-0 small">Acepta o rechaza inscripciones con un clic.</p>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex align-items-center gap-3">
+        <span class="benefit-icon icon-green"><i class="bi bi-bar-chart-line"></i></span>
+        <div>
+          <strong>Resultados profesionales</strong>
+          <p class="text-muted-2 mb-0 small">Registra tiempos, podios y clasificación.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="row g-4">
+      @for (i of [1,2,3]; track i) {
+        <div class="col-md-4"><div class="card" style="height:380px"><div class="card-body"><span class="skeleton" style="height:100%; width:100%; display:block"></span></div></div></div>
+      }
+    </div>
+  } @else if (!plans.length) {
+    <div class="card">
+      <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-card-list"></i></div>
+        <h5>No hay planes disponibles</h5>
+        <p>Vuelve más tarde o contacta con un administrador.</p>
+      </div>
+    </div>
+  } @else {
+    <div class="row g-4 plans-grid">
+      @for (plan of plans; track plan.id; let i = $index) {
+        <div class="col-md-6 col-lg-4">
+          <div class="plan-card" [class.featured]="isPopular(plan, i)">
+            @if (isPopular(plan, i)) {
+              <span class="popular-badge"><i class="bi bi-star-fill"></i> Más popular</span>
+            }
+
+            <h3 class="plan-name">{{ plan.name }}</h3>
+            @if (plan.description) { <p class="plan-desc">{{ plan.description }}</p> }
+
+            <div class="plan-price">
+              <span class="amount">{{ plan.price | currency:'EUR':'symbol':'1.0-2' }}</span>
+              <span class="per">/ {{ plan.duration_days }} días</span>
+            </div>
+            <div class="plan-monthly">~ {{ pricePerMonth(plan) | currency:'EUR':'symbol':'1.0-2' }} / mes</div>
+
+            <ul class="plan-features">
+              <li><i class="bi bi-check-circle-fill"></i> Hasta <strong>{{ plan.max_championships }}</strong> campeonatos activos</li>
+              <li><i class="bi bi-check-circle-fill"></i> Inscripciones ilimitadas</li>
+              <li><i class="bi bi-check-circle-fill"></i> Resultados, podios y clasificación</li>
+              <li><i class="bi bi-check-circle-fill"></i> Meteorología por circuito</li>
+              <li><i class="bi bi-check-circle-fill"></i> Comprobantes PDF de pago</li>
+            </ul>
+
+            <button
+              type="button"
+              class="btn w-100 btn-icon justify-content-center"
+              [class.btn-primary]="isPopular(plan, i)"
+              [class.btn-outline-primary]="!isPopular(plan, i)"
+              (click)="subscribe(plan)"
+              [disabled]="subscribing === plan.id"
+            >
+              @if (subscribing === plan.id) {
+                <span class="spinner-border spinner-border-sm"></span> Redirigiendo...
+              } @else {
+                <i class="bi bi-credit-card-2-back"></i> Suscribirme
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <p class="text-muted-2 text-center mt-4 small">
+      <i class="bi bi-shield-check"></i> Pago seguro a través de Stripe. Puedes cancelar tu suscripción cuando quieras.
+    </p>
+  }
+</div>

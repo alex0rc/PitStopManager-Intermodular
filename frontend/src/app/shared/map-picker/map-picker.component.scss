@@ -1,0 +1,11 @@
+.map-picker {
+  width: 100%;
+}
+
+.map-host {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--ps-border);
+  overflow: hidden;
+  z-index: 1;
+}

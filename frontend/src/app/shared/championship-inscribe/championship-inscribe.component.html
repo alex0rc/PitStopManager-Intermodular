@@ -1,0 +1,174 @@
+@if (successMsg) {
+  <div class="alert alert-success py-2 mb-2" [class.alert-sm]="layout === 'hero'">
+    <i class="bi bi-check-circle me-1"></i>{{ successMsg }}
+  </div>
+}
+
+@if (canInscribe) {
+  <div class="inscribe-wrap" [class.inscribe-hero]="layout === 'hero'" [class.inscribe-card]="layout === 'card'">
+    @if (inscriptionLoading) {
+      <span class="spinner-border spinner-border-sm" [class.text-light]="layout === 'hero'"></span>
+    } @else if (myInscription) {
+      @if (layout === 'card') {
+        <span class="badge bg-success-subtle text-success border border-success-subtle w-100 py-2">
+          {{ inscriptionStatusLabel(myInscription.status) }}
+        </span>
+        @if (requiresOwnKart) {
+          <p class="small text-muted mt-2 mb-0">
+            <i class="bi bi-wrench me-1"></i>
+            {{ myInscription.kart_info || 'Sin datos de kart — edita tu inscripción' }}
+          </p>
+        }
+        @if (canEditRaces(myInscription)) {
+          <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-2" (click)="openModal($event)">
+            <i class="bi bi-pencil me-1"></i>Editar inscripción
+          </button>
+        }
+      } @else {
+        <div class="inscribe-status insc-{{ myInscription.status }}">
+          <div>
+            <strong><i class="bi bi-person-check me-1"></i>{{ inscriptionStatusLabel(myInscription.status) }}</strong>
+            @if (myInscription.races?.length) {
+              <small class="d-block mt-1 opacity-90">
+                <i class="bi bi-flag me-1"></i>{{ raceNames(myInscription) }}
+              </small>
+            }
+            @if (requiresOwnKart) {
+              <small class="d-block mt-1 opacity-90">
+                <i class="bi bi-wrench me-1"></i>
+                {{ myInscription.kart_info || 'Sin datos de kart' }}
+              </small>
+            }
+          </div>
+          @if (canEditRaces(myInscription)) {
+            <button type="button" class="btn btn-light btn-sm" (click)="openModal()">
+              <i class="bi bi-pencil me-1"></i>Editar inscripción
+            </button>
+          }
+        </div>
+      }
+    } @else {
+      <button
+        type="button"
+        class="btn btn-danger"
+        [class.btn-lg]="layout === 'hero'"
+        [class.w-100]="layout === 'card'"
+        (click)="openModal($event)"
+      >
+        <i class="bi bi-pencil-square me-1"></i>Inscribirse
+      </button>
+    }
+  </div>
+} @else if (!auth.isLoggedIn && isOpenForInscription) {
+  <a
+    [routerLink]="['/login']"
+    [queryParams]="{ returnUrl: returnUrl }"
+    class="btn btn-danger"
+    [class.btn-lg]="layout === 'hero'"
+    [class.w-100]="layout === 'card'"
+    (click)="$event.stopPropagation()"
+  >
+    <i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión
+  </a>
+} @else if (inscribeBlockedHint && layout === 'hero') {
+  <p class="inscribe-hint mb-0 mt-2">
+    <i class="bi bi-info-circle me-1"></i>{{ inscribeBlockedHint }}
+  </p>
+} @else if (inscribeBlockedHint && layout === 'card') {
+  <p class="small text-muted mb-0 mt-2">{{ inscribeBlockedHint }}</p>
+}
+
+@if (showModal) {
+  <div class="modal fade show d-block inscribe-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            @if (myInscription) {
+              Editar carreras — {{ championship.name }}
+            } @else {
+              Inscripción — {{ championship.name }}
+            }
+          </h5>
+          <button type="button" class="btn-close" (click)="closeModal()" [disabled]="inscribing"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted small">
+            {{ kartModalityLabel }}@if (championship.engine_class) { · {{ championship.engine_class }} }.
+            Elige las carreras en las que participarás.
+          </p>
+          @if (errorMsg) {
+            <div class="alert alert-danger py-2">{{ errorMsg }}</div>
+          }
+          @if (requiresOwnKart) {
+            <div class="mb-3">
+              <label class="form-label" for="inscribeKartInfo">Tu kart (chasis y motor) *</label>
+              <input
+                id="inscribeKartInfo"
+                type="text"
+                class="form-control"
+                [(ngModel)]="modalKartInfo"
+                placeholder="Ej. Tony Kart Racer 401 / IAME X30"
+                maxlength="500"
+              />
+            </div>
+          } @else {
+            <div class="alert alert-light border py-2 small mb-3">
+              <i class="bi bi-info-circle me-1"></i>
+              Los karts los proporciona el circuito. Solo necesitas tu dorsal si el organizador lo asigna.
+            </div>
+          }
+          <div class="mb-3">
+            <label class="form-label" for="inscribeCarNumber">Nº de dorsal (opcional)</label>
+            <input
+              id="inscribeCarNumber"
+              type="number"
+              class="form-control"
+              min="1"
+              [(ngModel)]="modalCarNumber"
+            />
+          </div>
+          <h6 class="fw-semibold mb-2">Carreras</h6>
+          @if (modalRacesLoading) {
+            <div class="text-center py-3">
+              <div class="spinner-border spinner-border-sm text-danger"></div>
+            </div>
+          } @else if (modalRaces.length === 0) {
+            <div class="alert alert-info mb-0">No hay carreras abiertas para inscripción aún.</div>
+          } @else {
+            <div class="list-group">
+              @for (race of modalRaces; track race.id) {
+                <label class="list-group-item d-flex gap-2 align-items-start">
+                  <input
+                    class="form-check-input mt-1"
+                    type="checkbox"
+                    [checked]="isRaceSelected(race.id)"
+                    (change)="toggleRace(race.id, $any($event.target).checked)"
+                  />
+                  <span>
+                    <strong>{{ race.name }}</strong>
+                    <span class="d-block small text-muted">{{ formatRaceDate(race.scheduled_at) }}</span>
+                  </span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="inscribing">Cancelar</button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="submit()"
+            [disabled]="inscribing || modalRacesLoading || (modalRaces.length > 0 && selectedRaceIds.size === 0)"
+          >
+            @if (inscribing) {
+              <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            {{ myInscription ? 'Guardar' : 'Confirmar inscripción' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

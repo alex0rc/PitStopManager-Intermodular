@@ -1,0 +1,98 @@
+:host { display: block; }
+
+.search-card {
+  position: relative;
+  background: var(--ps-surface);
+  border: 1px solid var(--ps-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--ps-shadow-sm);
+
+  .search-icon {
+    position: absolute;
+    left: 1.15rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ps-text-muted);
+    font-size: 1.05rem;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .search-input {
+    border: 0;
+    padding-left: 3rem;
+    background: transparent;
+
+    &:focus { box-shadow: none; }
+  }
+}
+
+.champ-card-link {
+  display: block;
+  color: inherit;
+  position: relative;
+}
+
+.championship-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--ps-shadow-lg);
+  }
+
+  .champ-card-link:hover .champ-name {
+    color: var(--ps-primary);
+  }
+
+  .card-img-top {
+    height: 170px;
+    object-fit: cover;
+    background: #0f172a;
+  }
+
+  .placeholder-img {
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(at 20% 20%, rgba(225, 29, 46, 0.4), transparent 55%),
+      linear-gradient(135deg, #0b1224 0%, #1a1a2e 100%);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 2.6rem;
+  }
+
+  .card-status {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  }
+
+  .card-skeleton {
+    height: 170px;
+    background: #f3f4f6;
+  }
+}
+
+.champ-name {
+  font-weight: 700;
+  margin-bottom: 0.65rem;
+  color: var(--ps-text);
+}
+
+.champ-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--ps-text-muted);
+
+  i { color: var(--ps-primary); margin-right: 0.35rem; }
+}

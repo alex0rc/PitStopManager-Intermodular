@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.championship-results-block {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.summary-card {
+  border-radius: 0.75rem;
+}
+
+.race-filter .form-select {
+  border-color: var(--ps-border, #dee2e6);
+}

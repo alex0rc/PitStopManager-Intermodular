@@ -1,0 +1,222 @@
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="container position-relative">
+    <div class="row align-items-center g-5 py-5">
+      <div class="col-lg-7 hero-copy fade-in-up">
+        <div class="hero-brand mb-3">
+          <app-brand-logo size="lg" />
+        </div>
+        <span class="hero-eyebrow">
+          <i class="bi bi-lightning-charge-fill"></i>
+          Plataforma profesional de karting amateur
+        </span>
+
+        <h1 class="hero-title">
+          Domina la pista.<br />
+          <span class="hero-title-accent">Gestiona tu campeonato.</span>
+        </h1>
+
+        <p class="hero-lead">
+          PitStop Manager reúne en un solo lugar circuitos, carreras, inscripciones,
+          resultados y clasificaciones. Organiza como un profesional, compite como un piloto.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 mt-4">
+          <a routerLink="/register" class="btn btn-primary btn-lg btn-icon">
+            <i class="bi bi-rocket-takeoff"></i> Empezar gratis
+          </a>
+          <a routerLink="/championships" class="btn btn-outline-light btn-lg btn-icon">
+            <i class="bi bi-trophy"></i> Ver campeonatos
+          </a>
+          <a routerLink="/circuits" class="btn btn-outline-light btn-lg btn-icon">
+            <i class="bi bi-pin-map"></i> Circuitos
+          </a>
+        </div>
+
+        <div class="hero-stats mt-5">
+          <div class="stat">
+            <span class="stat-value">3</span>
+            <span class="stat-label">Roles</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">∞</span>
+            <span class="stat-label">Carreras</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">24/7</span>
+            <span class="stat-label">Clasificaciones</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">Live</span>
+            <span class="stat-label">Meteorología</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 d-none d-lg-block">
+        @if (loadingFeatured) {
+          <div class="hero-card fade-in-up hero-card-loading">
+            <div class="placeholder-glow">
+              <span class="placeholder col-6 mb-3"></span>
+              <span class="placeholder col-10 mb-2"></span>
+              <span class="placeholder col-8 mb-4"></span>
+              @for (i of [1,2,3,4]; track i) {
+                <span class="placeholder col-12 mb-2"></span>
+              }
+            </div>
+          </div>
+        } @else if (featured) {
+          <a class="hero-card fade-in-up text-decoration-none" [routerLink]="['/championships', featured.championship.id]">
+            <div class="hero-card-header">
+              <div class="d-flex align-items-center gap-2">
+                <span class="status-dot"></span>
+                <small class="text-uppercase fw-semibold">{{ statusLabel(featured.championship.status) }}</small>
+              </div>
+              @if (featured.next_race) {
+                <span class="hero-card-tag">{{ featured.next_race.name }}</span>
+              }
+            </div>
+
+            <h5 class="mt-3 mb-1">{{ featured.championship.name }}</h5>
+            <p class="text-muted-2 small mb-3">
+              @if (circuitLocation()) {
+                {{ circuitLocation() }}
+              } @else {
+                {{ featured.championship.season_year }} · {{ featured.championship.races_count ?? 0 }} carreras
+              }
+            </p>
+
+            <div class="hero-card-rows">
+              @if (featured.standings.length) {
+                @for (row of featured.standings; track row.user_id; let i = $index) {
+                  <div class="row-line" [class.muted]="i >= 3">
+                    <span class="rank" [ngClass]="rankClass(i)">{{ i + 1 }}</span>
+                    <span class="pilot">{{ pilotShortName(row.pilot_name) }}</span>
+                    <span class="time">{{ pointsLabel(row, i, featured.standings) }}</span>
+                  </div>
+                }
+              } @else {
+                <div class="row-line muted">
+                  <span class="pilot">Sin resultados aún</span>
+                  <span class="time">—</span>
+                </div>
+              }
+            </div>
+
+            <div class="hero-card-footer">
+              <i class="bi bi-cloud-sun"></i> {{ weatherLine(featured.weather) }}
+            </div>
+          </a>
+        } @else {
+          <div class="hero-card fade-in-up">
+            <p class="text-muted-2 small mb-0">{{ featuredError || 'No hay campeonatos publicados todavía.' }}</p>
+            <a routerLink="/championships" class="btn btn-sm btn-outline-light mt-3">Ver campeonatos</a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-eyebrow">¿Qué puedes hacer?</span>
+      <h2 class="section-title">Una plataforma, todo el campeonato</h2>
+      <p class="section-lead">Diseñada para organizadores y pilotos. Construida sobre Laravel + Angular.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon icon-red"><i class="bi bi-trophy"></i></div>
+          <h5>Organiza campeonatos</h5>
+          <p>Crea categorías, circuitos y carreras. Define puntuación y reglas en minutos.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon icon-blue"><i class="bi bi-person-check"></i></div>
+          <h5>Inscríbete fácil</h5>
+          <p>Encuentra campeonatos abiertos, regístrate como piloto y compite donde quieras.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon icon-green"><i class="bi bi-bar-chart-line"></i></div>
+          <h5>Clasificaciones en vivo</h5>
+          <p>Resultados, vueltas rápidas, evolución de puntos y podiums siempre actualizados.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon icon-amber"><i class="bi bi-cloud-sun"></i></div>
+          <h5>Meteorología real</h5>
+          <p>Consulta el tiempo del circuito antes de competir y planifica tu estrategia.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="roles py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-eyebrow">Hecho para ti</span>
+      <h2 class="section-title">Un rol para cada perfil</h2>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-lg-5">
+        <div class="role-card featured">
+          <div class="role-badge organizer"><i class="bi bi-trophy-fill"></i> Organizador</div>
+          <h4>Crea campeonatos</h4>
+          <p>Diseña tus campeonatos, circuitos y carreras. Acepta inscripciones y registra resultados.</p>
+          <ul class="role-features">
+            <li><i class="bi bi-check2"></i> Campeonatos por plan</li>
+            <li><i class="bi bi-check2"></i> Suscripción mensual o anual</li>
+            <li><i class="bi bi-check2"></i> Pago seguro con Stripe</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="role-card">
+          <div class="role-badge pilot"><i class="bi bi-helmet"></i> Piloto</div>
+          <h4>Compite y mejora</h4>
+          <p>Inscríbete en campeonatos, revisa tus resultados y compara tus tiempos vuelta a vuelta.</p>
+          <ul class="role-features">
+            <li><i class="bi bi-check2"></i> Mis inscripciones</li>
+            <li><i class="bi bi-check2"></i> Mis resultados</li>
+            <li><i class="bi bi-check2"></i> Perfil deportivo</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container">
+    <div class="cta-card">
+      <div class="cta-decor"></div>
+      <div class="cta-content">
+        <h3>¿Listo para acelerar?</h3>
+        <p>Crea tu cuenta gratis como piloto. ¿Eres organizador? Activa una suscripción y empieza a publicar campeonatos.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a routerLink="/register" class="btn btn-light btn-lg btn-icon">
+            <i class="bi bi-rocket-takeoff"></i> Crear cuenta
+          </a>
+          <a routerLink="/login" class="btn btn-outline-light btn-lg btn-icon">
+            <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

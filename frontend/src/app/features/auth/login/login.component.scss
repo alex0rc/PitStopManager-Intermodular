@@ -1,0 +1,204 @@
+$accent: #e11d2e;
+
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  min-height: 100dvh;
+  background: var(--ps-surface-2);
+
+  @media (max-width: 991.98px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// --- Panel marca ---
+.auth-aside {
+  position: relative;
+  overflow: hidden;
+  min-height: 100%;
+  background:
+    radial-gradient(at 20% 10%, rgba(225, 29, 46, 0.4) 0%, transparent 55%),
+    radial-gradient(at 80% 90%, rgba(14, 165, 233, 0.25) 0%, transparent 55%),
+    linear-gradient(135deg, #0b1224 0%, #0f172a 50%, #1a1a2e 100%);
+  color: #fff;
+  padding: 2.5rem clamp(1.5rem, 3vw, 3rem);
+  display: flex;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at center, black 35%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 75%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 991.98px) {
+    min-height: 240px;
+    padding: 1.75rem 1.5rem;
+  }
+}
+
+.auth-aside-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  margin: auto;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: auto;
+
+  small {
+    display: block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+    margin-top: 0.15rem;
+  }
+  .brand-accent { color: $accent; }
+}
+
+.auth-brand .brand-logo {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.auth-aside-content {
+  margin-top: 3rem;
+
+  @media (max-width: 991.98px) {
+    margin-top: 1.5rem;
+  }
+
+  h2 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0.85rem 0 1rem;
+  }
+  p {
+    color: rgba(255, 255, 255, 0.72);
+    max-width: 420px;
+    margin-bottom: 1.75rem;
+  }
+}
+
+.aside-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+
+  i { color: #fde047; }
+}
+
+.aside-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  .aside-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.85);
+
+    i { color: #22c55e; font-size: 1.1rem; }
+  }
+}
+
+.auth-aside-footer {
+  margin-top: auto;
+  padding-top: 2rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+
+  @media (max-width: 991.98px) { display: none; }
+}
+
+// --- Formulario ---
+.auth-form-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2.5rem 1.5rem;
+  background: var(--ps-surface-2);
+}
+
+.auth-form-card {
+  width: 100%;
+  max-width: 430px;
+  background: var(--ps-surface);
+  color: var(--ps-text);
+  border-radius: 1.25rem;
+  padding: clamp(1.75rem, 3vw, 2.5rem);
+  border: 1px solid var(--ps-border);
+  box-shadow: var(--ps-shadow-lg);
+}
+
+// --- Inputs ---
+.input-group-icon {
+  position: relative;
+
+  .input-icon {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ps-text-muted);
+    z-index: 4;
+    pointer-events: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
+
+  .form-control {
+    padding-left: 2.5rem;
+  }
+
+  .input-eye {
+    position: absolute;
+    right: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    color: var(--ps-text-muted);
+    z-index: 4;
+    padding: 0.25rem 0.45rem;
+    border-radius: 0.35rem;
+
+    &:hover { color: var(--ps-text); background: var(--ps-surface-3); }
+  }
+}

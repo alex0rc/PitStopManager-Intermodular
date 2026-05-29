@@ -1,0 +1,148 @@
+<div class="container py-4">
+  @if (loading) {
+    <div class="card mb-4">
+      <span class="skeleton" style="height:240px;display:block"></span>
+      <div class="card-body">
+        <span class="skeleton" style="height:32px;width:60%;display:block;margin-bottom:10px"></span>
+        <span class="skeleton" style="height:18px;width:40%;display:block"></span>
+      </div>
+    </div>
+  }
+
+  @if (error) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-exclamation-triangle text-danger fs-1 d-block mb-3"></i>
+        <h2 class="h5 fw-bold">No se pudo mostrar el circuito</h2>
+        <p class="text-muted mb-4">{{ error }}</p>
+        <a [routerLink]="backLink" class="btn btn-danger">
+          <i class="bi bi-arrow-left me-1"></i> Volver a circuitos
+        </a>
+      </div>
+    </div>
+  }
+
+  @if (!loading && circuit) {
+    <a [routerLink]="backLink" class="back-link mb-3 d-inline-flex align-items-center gap-1">
+      <i class="bi bi-arrow-left"></i> Volver a circuitos
+    </a>
+
+    <section class="circuit-hero mb-4">
+      <div class="circuit-hero-image">
+        @if (circuit.image) {
+          <img [src]="circuit.image" [alt]="circuit.name" />
+        } @else {
+          <div class="placeholder-art"><i class="bi bi-pin-map-fill"></i></div>
+        }
+        <div class="circuit-hero-fade"></div>
+      </div>
+
+      <div class="circuit-hero-content">
+        <div class="circuit-meta">
+          @if (circuit.status && circuit.status !== 'approved') {
+            <span class="status-pill" [class]="statusClass(circuit.status)">
+              {{ statusLabel(circuit.status) }}
+            </span>
+          } @else {
+            <span class="badge bg-theme-subtle"><i class="bi bi-check-circle me-1"></i> Catálogo oficial</span>
+          }
+          @if (circuit.province) {
+            <span class="badge bg-theme-subtle"><i class="bi bi-geo-alt me-1"></i> {{ circuit.province }}</span>
+          }
+          @if (circuit.length_meters) {
+            <span class="badge bg-theme-subtle"><i class="bi bi-rulers me-1"></i> {{ circuit.length_meters }} m</span>
+          }
+        </div>
+
+        <h1 class="circuit-title">{{ circuit.name }}</h1>
+        <p class="circuit-location">
+          <i class="bi bi-geo-alt-fill me-1"></i>{{ circuit.location }}
+        </p>
+        @if (locationLine()) {
+          <p class="circuit-region text-muted-2 mb-0">{{ locationLine() }}</p>
+        }
+
+        <div class="circuit-actions mt-3 d-flex flex-wrap gap-2">
+          @if (canEdit) {
+            <a [routerLink]="['/organizer/circuits', circuit.id, 'edit']" class="btn btn-warning btn-sm">
+              <i class="bi bi-pencil me-1"></i>Editar propuesta
+            </a>
+          }
+          @if (googleMapsUrl(); as url) {
+            <a [href]="url" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm">
+              <i class="bi bi-map me-1"></i>Abrir en Google Maps
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3"><i class="bi bi-card-text me-2"></i>Descripción</h2>
+            @if (circuit.description) {
+              <p class="mb-0" style="white-space: pre-wrap">{{ circuit.description }}</p>
+            } @else {
+              <p class="text-muted mb-0">Sin descripción adicional.</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-body p-4">
+            <h2 class="h6 fw-bold mb-3"><i class="bi bi-geo-alt me-2"></i>Ubicación</h2>
+            <p class="mb-2"><strong>{{ circuit.location }}</strong></p>
+            @if (locationLine() && locationLine() !== circuit.location) {
+              <p class="text-muted-2 small mb-3">{{ locationLine() }}</p>
+            }
+            @if (googleMapsUrl(); as mapsUrl) {
+              <a [href]="mapsUrl" target="_blank" rel="noopener" class="btn btn-outline-danger btn-sm w-100">
+                <i class="bi bi-map me-1"></i>Ver en Google Maps
+              </a>
+            } @else {
+              <p class="text-muted-2 small mb-0">Mapa no disponible para esta ubicación.</p>
+            }
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-body p-4">
+            <h2 class="h6 fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Datos técnicos</h2>
+            <ul class="list-unstyled circuit-facts mb-0">
+              <li><span>Longitud pista</span><strong>{{ circuit.length_meters ? circuit.length_meters + ' m' : '—' }}</strong></li>
+              @if (circuit.user?.name; as proposer) {
+                <li><span>Propuesto por</span><strong>{{ proposer }}</strong></li>
+              }
+            </ul>
+          </div>
+        </div>
+
+        @if (circuit.latitude != null && circuit.longitude != null) {
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h2 class="h6 fw-bold mb-3"><i class="bi bi-cloud-sun me-2"></i>Tiempo actual</h2>
+              @if (weatherLoading) {
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+              } @else if (weatherError) {
+                <p class="text-danger small mb-0">{{ weatherError }}</p>
+              } @else if (weather) {
+                <div class="weather-chip d-inline-flex">
+                  <i class="bi bi-thermometer-half"></i>
+                  <span class="weather-temp">{{ weather.temperature }}°C</span>
+                  <small>{{ weather.description }}</small>
+                </div>
+                @if (weather.wind_speed !== null) {
+                  <p class="small text-muted-2 mt-2 mb-0">Viento {{ weather.wind_speed }} km/h</p>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
