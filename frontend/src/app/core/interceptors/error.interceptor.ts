@@ -45,8 +45,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 401 && !isRedirecting) {
         const isAuthRequest =
           req.url.includes('/login') ||
-          req.url.includes('/register') ||
-          req.url.includes('/user');
+          req.url.includes('/register');
         if (!isAuthRequest) {
           isRedirecting = true;
           authService.clearSession();

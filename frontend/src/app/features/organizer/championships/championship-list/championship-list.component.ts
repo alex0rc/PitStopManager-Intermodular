@@ -35,6 +35,7 @@ export class ChampionshipListComponent implements OnInit {
   ngOnInit(): void {
     this.subscriptionService.getMySubscriptionWithQuota().subscribe({
       next: ({ quota }) => (this.quota = quota),
+      error: () => {},
     });
     this.loadChampionships();
   }
