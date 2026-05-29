@@ -26,3 +26,10 @@ dbdata/
 # Referencia local / IDE
 /reference/
 /.cursor/
+
+# Documentación local (solo en tu máquina, no en el repo)
+/SETUP.md
+/PROJECT_GUIDE.md
+/GUIA_VM_DOCKER_DESPLIEGUE.md
+/MEMORIA_Y_DESPLIEGUE.md
+/CHANGES.md
