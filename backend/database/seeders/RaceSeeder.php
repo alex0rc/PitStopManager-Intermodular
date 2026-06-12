@@ -5,10 +5,12 @@ namespace Database\Seeders;
 use App\Models\Championship;
 use App\Models\Circuit;
 use App\Models\Race;
+use Database\Seeders\Concerns\ResolvesSeedCircuits;
 use Illuminate\Database\Seeder;
 
 class RaceSeeder extends Seeder
 {
+    use ResolvesSeedCircuits;
     public function run(): void
     {
         $year = (int) now()->format('Y');
@@ -20,16 +22,16 @@ class RaceSeeder extends Seeder
         $cadetes   = Championship::where('name', 'Copa Cadetes Levante '.$year)->firstOrFail();
         $iberian   = Championship::where('name', 'Iberian Kart Tour '.$year)->firstOrFail();
 
-        $lucas     = $this->circuit('kartodromo-lucas-guerrero');
-        $gilesias  = $this->circuit('racing-center-gilesias');
-        $alacant   = $this->circuit('karting-alacant');
-        $marMenor  = $this->circuit('gokarts-mar-menor');
-        $cheste    = $this->circuit('circuit-ricardo-tormo');
-        $horta     = $this->circuit('karting-horta-nord');
-        $losGarres = $this->circuit('karting-los-garres');
-        $nucia     = $this->circuit('karting-nucia-outdoor');
-        $zuera     = $this->circuit('circuito-zuera-zaragoza');
-        $dakart    = $this->circuit('dakart-indoor-burjassot');
+        $lucas     = $this->resolveSeededCircuit('kartodromo-lucas-guerrero');
+        $gilesias  = $this->resolveSeededCircuit('racing-center-gilesias');
+        $alacant   = $this->resolveSeededCircuit('karting-alacant');
+        $marMenor  = $this->resolveSeededCircuit('gokarts-mar-menor');
+        $cheste    = $this->resolveSeededCircuit('circuit-ricardo-tormo');
+        $horta     = $this->resolveSeededCircuit('karting-horta-nord');
+        $losGarres = $this->resolveSeededCircuit('karting-los-garres');
+        $nucia     = $this->resolveSeededCircuit('karting-nucia-outdoor');
+        $zuera     = $this->resolveSeededCircuit('circuito-zuera-zaragoza');
+        $dakart    = $this->resolveSeededCircuit('dakart-indoor-burjassot');
 
         $races = [
             // Liga Levante — carreras pasadas (resultados) + próximas (tiempo / recordatorios)
@@ -187,10 +189,5 @@ class RaceSeeder extends Seeder
                 $row
             );
         }
-    }
-
-    private function circuit(string $slug): Circuit
-    {
-        return Circuit::where('slug', $slug)->firstOrFail();
     }
 }

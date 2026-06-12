@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Circuit;
 use App\Models\User;
 use Database\Seeders\Concerns\KartingImageUrls;
+use Database\Seeders\Concerns\ResolvesSeedCircuits;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class CircuitSeeder extends Seeder
 {
     use KartingImageUrls;
+    use ResolvesSeedCircuits;
 
     public function run(): void
     {
@@ -302,10 +304,7 @@ class CircuitSeeder extends Seeder
             $imageUrl = $imageUrls[$slug] ?? null;
             unset($row['image_slug']);
 
-            $circuit = Circuit::updateOrCreate(
-                ['slug' => $slug],
-                array_merge($row, ['slug' => $slug])
-            );
+            $circuit = $this->upsertSeededCircuit($row, $slug);
 
             $this->assignImage($circuit, $slug, $imageUrl, 'circuits');
         }
