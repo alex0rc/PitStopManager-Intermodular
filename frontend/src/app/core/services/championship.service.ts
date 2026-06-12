@@ -7,7 +7,7 @@ import { FeaturedChampionshipPayload } from '../models/featured-championship.mod
 import { RaceWithResults } from '../models/race-results.model';
 import { PaginatedResponse } from '../models/api-response.model';
 import { map } from 'rxjs/operators';
-import { unwrapList } from '../utils/api-response';
+import { normalizePaginated, unwrapList } from '../utils/api-response';
 
 export interface StandingEntry {
   user_id: number;
@@ -36,7 +36,9 @@ export class ChampionshipService {
         httpParams = httpParams.set(key, value.toString());
       });
     }
-    return this.http.get<PaginatedResponse<Championship>>(this.apiUrl, { params: httpParams });
+    return this.http
+      .get<PaginatedResponse<Championship>>(this.apiUrl, { params: httpParams })
+      .pipe(map((res) => normalizePaginated(res)));
   }
 
   getMine(params?: Record<string, string | number>): Observable<PaginatedResponse<Championship>> {
@@ -46,10 +48,12 @@ export class ChampionshipService {
         httpParams = httpParams.set(key, value.toString());
       });
     }
-    return this.http.get<PaginatedResponse<Championship>>(
-      `${environment.apiUrl}/my/championships`,
-      { params: httpParams }
-    );
+    return this.http
+      .get<PaginatedResponse<Championship>>(
+        `${environment.apiUrl}/my/championships`,
+        { params: httpParams },
+      )
+      .pipe(map((res) => normalizePaginated(res)));
   }
 
   getById(id: number): Observable<Championship> {

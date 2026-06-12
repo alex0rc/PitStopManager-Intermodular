@@ -38,7 +38,7 @@
         <span class="visually-hidden">Cargando...</span>
       </div>
     </div>
-  } @else if (championships.length === 0) {
+  } @else if (!error && championships.length === 0) {
     <div class="alert alert-info">
       No tienes campeonatos creados aún. ¡Crea tu primer campeonato!
     </div>
@@ -77,25 +77,23 @@
                      class="btn btn-outline-success" title="Inscripciones">
                     <i class="bi bi-people"></i>
                   </a>
-                  @if (isOwner(champ)) {
-                    <a [routerLink]="['/organizer/championships', champ.id, 'edit']"
-                       class="btn btn-outline-warning" title="Editar">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                    <select class="form-select form-select-sm status-select"
-                            [value]="champ.status"
-                            (change)="changeStatus(champ, $any($event.target).value)"
-                            title="Cambiar estado">
-                      <option value="draft">Borrador</option>
-                      <option value="published">Publicado</option>
-                      <option value="in_progress">En curso</option>
-                      <option value="finished">Finalizado</option>
-                      <option value="cancelled">Cancelado</option>
-                    </select>
-                    <button class="btn btn-outline-danger" (click)="deleteChampionship(champ.id)" title="Eliminar">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  }
+                  <a [routerLink]="['/organizer/championships', champ.id, 'edit']"
+                     class="btn btn-outline-warning" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <select class="form-select form-select-sm status-select"
+                          [value]="champ.status"
+                          (change)="changeStatus(champ, $any($event.target).value)"
+                          title="Cambiar estado">
+                    <option value="draft">Borrador</option>
+                    <option value="published">Publicado</option>
+                    <option value="in_progress">En curso</option>
+                    <option value="finished">Finalizado</option>
+                    <option value="cancelled">Cancelado</option>
+                  </select>
+                  <button class="btn btn-outline-danger" (click)="deleteChampionship(champ.id)" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </div>
               </td>
             </tr>

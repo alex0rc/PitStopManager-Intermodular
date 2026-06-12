@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Circuit } from '../models/circuit.model';
 import { PaginatedResponse } from '../models/api-response.model';
+import { normalizePaginated } from '../utils/api-response';
 
 @Injectable({ providedIn: 'root' })
 export class CircuitService {
@@ -34,10 +35,9 @@ export class CircuitService {
         httpParams = httpParams.set(key, value.toString());
       });
     }
-    return this.http.get<PaginatedResponse<Circuit>>(
-      `${environment.apiUrl}/my/circuits`,
-      { params: httpParams }
-    );
+    return this.http
+      .get<PaginatedResponse<Circuit>>(`${environment.apiUrl}/my/circuits`, { params: httpParams })
+      .pipe(map((res) => normalizePaginated(res)));
   }
 
   getById(id: number): Observable<Circuit> {

@@ -6,7 +6,7 @@ export interface PaginatedResponse<T> {
     per_page: number;
     total: number;
   };
-  links: {
+  links?: {
     first: string;
     last: string;
     prev: string | null;

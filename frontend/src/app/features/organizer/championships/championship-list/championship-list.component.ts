@@ -28,16 +28,15 @@ export class ChampionshipListComponent implements OnInit {
     private subscriptionService: SubscriptionService,
   ) {}
 
-  isOwner(champ: Championship): boolean {
-    return champ.user_id === this.auth.currentUser?.id;
-  }
-
   ngOnInit(): void {
     this.subscriptionService.getMySubscriptionWithQuota().subscribe({
       next: ({ quota }) => (this.quota = quota),
       error: () => {},
     });
-    this.loadChampionships();
+    this.auth.getUser().subscribe({
+      next: () => this.loadChampionships(),
+      error: () => this.loadChampionships(),
+    });
   }
 
   get canCreateChampionship(): boolean {
@@ -49,9 +48,9 @@ export class ChampionshipListComponent implements OnInit {
     this.error = '';
     this.championshipService.getMine({ page: this.currentPage }).subscribe({
       next: (res) => {
-        this.championships = res.data;
-        this.currentPage = res.meta.current_page;
-        this.lastPage = res.meta.last_page;
+        this.championships = res.data ?? [];
+        this.currentPage = res.meta?.current_page ?? 1;
+        this.lastPage = res.meta?.last_page ?? 1;
         this.loading = false;
       },
       error: (err) => {
