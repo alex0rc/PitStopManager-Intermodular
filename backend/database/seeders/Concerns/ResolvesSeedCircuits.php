@@ -83,18 +83,27 @@ trait ResolvesSeedCircuits
             return $byNeedle;
         }
 
-        $available = Circuit::query()
-            ->select(['id', 'name', 'slug'])
-            ->orderBy('id')
-            ->get()
-            ->map(fn (Circuit $circuit) => $circuit->slug
-                ? "{$circuit->slug} ({$circuit->name})"
-                : $circuit->name)
-            ->implode(', ');
+        $byNormalized = $this->findCircuitByNormalizedNeedle($meta['needle']);
+        if ($byNormalized) {
+            $this->backfillCircuitSlug($byNormalized, $slug);
 
-        throw new ModelNotFoundException(
-            "Circuit [{$slug}] not found. Total circuits: ".Circuit::count().". Available: {$available}"
-        );
+            return $byNormalized;
+        }
+
+        throw (new ModelNotFoundException(
+            "Circuit [{$slug}] not found. Total circuits: ".Circuit::count().". Available: ".$this->availableCircuitNames()
+        ))->setModel(Circuit::class, [$slug]);
+    }
+
+    protected function prepareSeededCircuits(): void
+    {
+        foreach (array_keys($this->seededCircuitSlugs()) as $slug) {
+            if ($this->circuitsHaveSlugColumn() && Circuit::where('slug', $slug)->exists()) {
+                continue;
+            }
+
+            $this->resolveSeededCircuit($slug);
+        }
     }
 
     protected function upsertSeededCircuit(array $row, string $slug): Circuit
@@ -136,5 +145,41 @@ trait ResolvesSeedCircuits
         if ($this->circuitsHaveSlugColumn() && $circuit->slug !== $slug) {
             $circuit->update(['slug' => $slug]);
         }
+    }
+
+    private function findCircuitByNormalizedNeedle(string $needle): ?Circuit
+    {
+        $target = $this->normalize($needle);
+
+        foreach (Circuit::all() as $circuit) {
+            if (str_contains($this->normalize($circuit->name), $target)) {
+                return $circuit;
+            }
+        }
+
+        return null;
+    }
+
+    private function normalize(string $value): string
+    {
+        $value = mb_strtolower($value, 'UTF-8');
+        $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+
+        return preg_replace('/[^a-z0-9]+/', '', $ascii ?: $value) ?? '';
+    }
+
+    private function availableCircuitNames(): string
+    {
+        return Circuit::query()
+            ->orderBy('id')
+            ->get()
+            ->map(function (Circuit $circuit) {
+                if ($this->circuitsHaveSlugColumn() && $circuit->slug) {
+                    return "{$circuit->slug} ({$circuit->name})";
+                }
+
+                return $circuit->name;
+            })
+            ->implode(', ');
     }
 }

@@ -13,6 +13,8 @@ class RaceSeeder extends Seeder
     use ResolvesSeedCircuits;
     public function run(): void
     {
+        $this->prepareSeededCircuits();
+
         $year = (int) now()->format('Y');
 
         $liga      = Championship::where('name', 'Liga Levante Karting '.$year)->firstOrFail();
