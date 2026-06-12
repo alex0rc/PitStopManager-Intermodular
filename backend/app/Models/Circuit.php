@@ -14,6 +14,7 @@ class Circuit extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'slug',
         'location',
         'city',
         'province',

@@ -20,16 +20,16 @@ class RaceSeeder extends Seeder
         $cadetes   = Championship::where('name', 'Copa Cadetes Levante '.$year)->firstOrFail();
         $iberian   = Championship::where('name', 'Iberian Kart Tour '.$year)->firstOrFail();
 
-        $lucas     = Circuit::where('name', 'Kartódromo Internacional Lucas Guerrero')->firstOrFail();
-        $gilesias  = Circuit::where('name', 'Racing Center Gilesias')->firstOrFail();
-        $alacant   = Circuit::where('name', 'Karting Alacant')->firstOrFail();
-        $marMenor  = Circuit::where('name', 'Go-Karts Mar Menor')->firstOrFail();
-        $cheste    = Circuit::where('name', 'Circuit Ricardo Tormo')->firstOrFail();
-        $horta     = Circuit::where('name', 'Karting Horta Nord')->firstOrFail();
-        $losGarres = Circuit::where('name', 'Karting Los Garres')->firstOrFail();
-        $nucia     = Circuit::where('name', 'Karting La Nucía Outdoor')->firstOrFail();
-        $zuera     = Circuit::where('name', 'Circuito de Zuera')->firstOrFail();
-        $dakart    = Circuit::where('name', 'Dakart Indoor')->firstOrFail();
+        $lucas     = $this->circuit('kartodromo-lucas-guerrero');
+        $gilesias  = $this->circuit('racing-center-gilesias');
+        $alacant   = $this->circuit('karting-alacant');
+        $marMenor  = $this->circuit('gokarts-mar-menor');
+        $cheste    = $this->circuit('circuit-ricardo-tormo');
+        $horta     = $this->circuit('karting-horta-nord');
+        $losGarres = $this->circuit('karting-los-garres');
+        $nucia     = $this->circuit('karting-nucia-outdoor');
+        $zuera     = $this->circuit('circuito-zuera-zaragoza');
+        $dakart    = $this->circuit('dakart-indoor-burjassot');
 
         $races = [
             // Liga Levante — carreras pasadas (resultados) + próximas (tiempo / recordatorios)
@@ -187,5 +187,10 @@ class RaceSeeder extends Seeder
                 $row
             );
         }
+    }
+
+    private function circuit(string $slug): Circuit
+    {
+        return Circuit::where('slug', $slug)->firstOrFail();
     }
 }

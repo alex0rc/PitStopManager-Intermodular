@@ -303,8 +303,8 @@ class CircuitSeeder extends Seeder
             unset($row['image_slug']);
 
             $circuit = Circuit::updateOrCreate(
-                ['name' => $row['name']],
-                $row
+                ['slug' => $slug],
+                array_merge($row, ['slug' => $slug])
             );
 
             $this->assignImage($circuit, $slug, $imageUrl, 'circuits');
